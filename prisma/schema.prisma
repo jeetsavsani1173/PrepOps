@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum OpportunityStatus {
+  SAVED
+  APPLIED
+  INTERVIEW
+  BETTER_LUCK_NEXT_TIME
+}
+
+enum ApplicationDecision {
+  APPLY_NOW
+  APPLY_AFTER_PREP
+  SKIP
+}
+
+enum PrepDifficulty {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Opportunity {
+  id                      String                @id @default(uuid())
+  companyName             String
+  roleTitle               String
+  source                  String
+  jobUrl                  String?
+  location                String?
+  salary                  String?
+  jobDescription          String?
+  status                  OpportunityStatus     @default(SAVED)
+  retentionDays           Int                   @default(14)
+  aiMatchScore            Int?
+
+  scrapedRawText          String?
+  scrapedHtml             String?
+  employmentType          String?
+  workModel               String?
+  experienceLevel         String?
+  requiredSkills          String?
+  preferredSkills         String?
+  responsibilities        String?
+  qualifications          String?
+  applicationDecision     ApplicationDecision?
+  prepDifficulty          PrepDifficulty?
+  aiRecommendationReason  String?
+
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+
+  statusHistory           StatusHistory[]
+  interviewNotes          InterviewNote[]
+  prepTasks               PrepTask[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([jobUrl])
+}
+
+model StatusHistory {
+  id            String             @id @default(uuid())
+  opportunityId String
+  fromStatus    OpportunityStatus
+  toStatus      OpportunityStatus
+  changedAt     DateTime           @default(now())
+
+  opportunity   Opportunity        @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([opportunityId])
+  @@index([changedAt])
+}
+
+model InterviewNote {
+  id            String      @id @default(uuid())
+  opportunityId String
+  roundName     String
+  questions     String?
+  feedback      String?
+  learnings     String?
+  followUps     String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([opportunityId])
+}
+
+model PrepTask {
+  id            String      @id @default(uuid())
+  opportunityId String
+  title         String
+  isCompleted   Boolean     @default(false)
+  dueDate       DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([opportunityId])
+  @@index([isCompleted])
+}
+
+model ResumeSnapshot {
+  id                  String   @id @default(uuid())
+  versionName         String
+  filePath            String
+  extractedSkillsText String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
