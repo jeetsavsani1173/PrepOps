@@ -3,6 +3,18 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { updateOpportunitySchema } from "@/lib/validations";
 
+export async function GET(
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) {
+  const { id } = await context.params;
+  const opportunity = await prisma.opportunity.findUnique({ where: { id } });
+  if (!opportunity) {
+    return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
+  }
+  return NextResponse.json({ data: opportunity });
+}
+
 export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> },

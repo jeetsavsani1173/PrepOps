@@ -26,6 +26,7 @@ export const updateOpportunitySchema = createOpportunitySchema.partial().extend(
 
 export const scrapeJobSchema = z.object({
   url: z.string().url(),
+  opportunityId: z.string().uuid().optional(),
 });
 
 export const extensionIngestSchema = z.object({
