@@ -4,6 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "PrepOps",
   description: "Local-first job tracking and interview prep system",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
