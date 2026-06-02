@@ -26,6 +26,22 @@ enum PrepDifficulty {
   HIGH
 }
 
+enum ReferralChannel {
+  LINKEDIN
+  EMAIL
+  OTHER
+}
+
+enum ReferralStatus {
+  PLANNED
+  REQUESTED
+  FOLLOWED_UP
+  RESPONDED
+  REFERRED
+  DECLINED
+  CLOSED
+}
+
 model Opportunity {
   id                      String                @id @default(uuid())
   companyName             String
@@ -58,6 +74,7 @@ model Opportunity {
   statusHistory           StatusHistory[]
   interviewNotes          InterviewNote[]
   prepTasks               PrepTask[]
+  referralRequests        ReferralRequest[]
 
   @@index([status])
   @@index([createdAt])
@@ -106,6 +123,45 @@ model PrepTask {
 
   @@index([opportunityId])
   @@index([isCompleted])
+}
+
+model ReferralRequest {
+  id              String             @id @default(uuid())
+  opportunityId   String
+  contactName     String
+  contactTitle    String?
+  contactCompany  String?
+  contactUrl      String?
+  contactEmail    String?
+  channel         ReferralChannel
+  status          ReferralStatus     @default(PLANNED)
+  initialMessage  String?
+  lastMessage     String?
+  nextFollowUpAt  DateTime?
+  notes           String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  opportunity     Opportunity        @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  followUps       ReferralFollowUp[]
+
+  @@index([opportunityId])
+  @@index([status])
+  @@index([nextFollowUpAt])
+}
+
+model ReferralFollowUp {
+  id                String          @id @default(uuid())
+  referralRequestId String
+  message           String
+  sentAt            DateTime        @default(now())
+  nextFollowUpAt    DateTime?
+  createdAt         DateTime        @default(now())
+
+  referralRequest   ReferralRequest @relation(fields: [referralRequestId], references: [id], onDelete: Cascade)
+
+  @@index([referralRequestId])
+  @@index([sentAt])
 }
 
 model ResumeSnapshot {

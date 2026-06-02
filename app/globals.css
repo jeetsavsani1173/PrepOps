@@ -13,7 +13,19 @@
 }
 
 body {
-  background: radial-gradient(circle at top, rgba(39, 39, 42, 0.38), transparent 38%),
-    linear-gradient(180deg, #09090b 0%, #0b0b0f 100%);
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(135deg, #08090d 0%, #111827 42%, #0f172a 68%, #101114 100%);
+  background-size: 42px 42px, 42px 42px, auto;
   color: var(--foreground);
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  outline-color: rgba(45, 212, 191, 0.7);
 }

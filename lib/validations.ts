@@ -7,6 +7,37 @@ const statusEnum = z.enum([
   "BETTER_LUCK_NEXT_TIME",
 ]);
 
+const referralChannelEnum = z.enum(["LINKEDIN", "EMAIL", "OTHER"]);
+const referralStatusEnum = z.enum([
+  "PLANNED",
+  "REQUESTED",
+  "FOLLOWED_UP",
+  "RESPONDED",
+  "REFERRED",
+  "DECLINED",
+  "CLOSED",
+]);
+
+const optionalUrlSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim().length === 0 ? undefined : value),
+  z.string().url().optional(),
+);
+
+const optionalEmailSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim().length === 0 ? undefined : value),
+  z.string().email().optional(),
+);
+
+const optionalDateSchema = z.preprocess((value) => {
+  if (value === null) return null;
+  if (value instanceof Date) return value;
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed.length === 0 ? undefined : new Date(trimmed);
+  }
+  return value;
+}, z.date().nullable().optional());
+
 export const createOpportunitySchema = z.object({
   companyName: z.string().trim().min(1),
   roleTitle: z.string().trim().min(1),
@@ -36,4 +67,28 @@ export const extensionIngestSchema = z.object({
   rawHtml: z.string().optional(),
   pageText: z.string().optional(),
   source: z.string().default("EXTENSION"),
+});
+
+export const createReferralSchema = z.object({
+  contactName: z.string().trim().min(1),
+  contactTitle: z.string().trim().optional(),
+  contactCompany: z.string().trim().optional(),
+  contactUrl: optionalUrlSchema,
+  contactEmail: optionalEmailSchema,
+  channel: referralChannelEnum,
+  status: referralStatusEnum.default("PLANNED"),
+  initialMessage: z.string().trim().optional(),
+  lastMessage: z.string().trim().optional(),
+  nextFollowUpAt: optionalDateSchema,
+  notes: z.string().trim().optional(),
+});
+
+export const updateReferralSchema = createReferralSchema.partial().extend({
+  status: referralStatusEnum.optional(),
+});
+
+export const createReferralFollowUpSchema = z.object({
+  message: z.string().trim().min(1),
+  sentAt: optionalDateSchema,
+  nextFollowUpAt: optionalDateSchema,
 });

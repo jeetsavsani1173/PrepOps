@@ -22,6 +22,33 @@ const statusLabel: Record<OpportunityStatus, string> = {
   BETTER_LUCK_NEXT_TIME: "Better luck next time",
 };
 
+const statusMeta: Record<OpportunityStatus, { label: string; accent: string; column: string; badge: string }> = {
+  SAVED: {
+    label: "Saved",
+    accent: "from-cyan-400 to-blue-500",
+    column: "border-cyan-500/30 bg-cyan-500/[0.04]",
+    badge: "border-cyan-400/40 bg-cyan-400/10 text-cyan-100",
+  },
+  APPLIED: {
+    label: "Applied",
+    accent: "from-emerald-400 to-teal-500",
+    column: "border-emerald-500/30 bg-emerald-500/[0.04]",
+    badge: "border-emerald-400/40 bg-emerald-400/10 text-emerald-100",
+  },
+  INTERVIEW: {
+    label: "OA/Interview",
+    accent: "from-amber-300 to-orange-500",
+    column: "border-amber-500/30 bg-amber-500/[0.04]",
+    badge: "border-amber-400/40 bg-amber-400/10 text-amber-100",
+  },
+  BETTER_LUCK_NEXT_TIME: {
+    label: "Better luck next time",
+    accent: "from-rose-400 to-red-500",
+    column: "border-rose-500/30 bg-rose-500/[0.04]",
+    badge: "border-rose-400/40 bg-rose-400/10 text-rose-100",
+  },
+};
+
 const periodOptions = [
   { value: "1d", label: "Past 1 day" },
   { value: "1w", label: "Past 1 week" },
@@ -38,9 +65,11 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [deleteOpportunityId, setDeleteOpportunityId] = useState<string | null>(null);
   const toastCounter = useRef(1);
 
   const active = opportunities.find((item) => item.id === activeId) ?? null;
+  const deleteTarget = opportunities.find((item) => item.id === deleteOpportunityId) ?? null;
 
   const byStatus = useMemo(
     () =>
@@ -132,12 +161,12 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
   }
 
   async function deleteOpportunity(id: string) {
-    if (!window.confirm("Delete this opportunity?")) return;
     const res = await fetch(`/api/opportunities/${id}`, { method: "DELETE" });
     if (!res.ok) return notify("Failed to delete", "error");
 
     setOpportunities((prev) => prev.filter((item) => item.id !== id));
     setActiveId(null);
+    setDeleteOpportunityId(null);
     notify("Opportunity deleted successfully.", "success");
   }
 
@@ -161,52 +190,83 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
   const applied = byStatus.APPLIED.length;
   const interviews = byStatus.INTERVIEW.length;
   const closed = byStatus.BETTER_LUCK_NEXT_TIME.length;
+  const activePipeline = applied + interviews;
 
   return (
-    <main className="relative mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-6 p-6">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(99,102,241,.22),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(16,185,129,.18),transparent_40%)]" />
-
-      <header className="flex items-center justify-between rounded-2xl border border-zinc-800/80 bg-zinc-900/75 px-5 py-4 shadow-[0_0_50px_rgba(0,0,0,.25)] backdrop-blur">
-        <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-emerald-400 to-indigo-500 text-sm font-black text-zinc-950">P</div>
-          <div>
-            <p className="text-xl font-semibold tracking-tight text-zinc-100">PrepOps</p>
-            <p className="text-xs text-zinc-400">Dream Role Command Center</p>
+    <main className="relative mx-auto flex w-full max-w-[1540px] flex-1 flex-col gap-6 p-4 sm:p-6">
+      <header className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 shadow-2xl backdrop-blur">
+        <div className="grid gap-6 border-b border-white/10 bg-[linear-gradient(135deg,rgba(20,184,166,.14),rgba(59,130,246,.08)_42%,rgba(245,158,11,.10))] p-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="min-w-0">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="grid h-11 w-11 place-items-center rounded-xl border border-emerald-300/40 bg-emerald-300 text-base font-black text-zinc-950 shadow-[0_0_28px_rgba(16,185,129,.35)]">P</div>
+              <div>
+                <p className="text-2xl font-semibold tracking-tight text-zinc-50">PrepOps</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">Dream Role Command Center</p>
+              </div>
+            </div>
+            <h1 className="max-w-3xl text-3xl font-semibold leading-tight text-zinc-50 sm:text-4xl">
+              Keep every opportunity, referral, and next move in one command view.
+            </h1>
           </div>
+          <button onClick={() => setShowAddModal(true)} className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-400 px-5 text-sm font-bold text-zinc-950 shadow-[0_14px_34px_rgba(16,185,129,.25)] transition hover:bg-emerald-300">
+            + Add Opportunity
+          </button>
         </div>
-        <button onClick={() => setShowAddModal(true)} className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950">+ Add Opportunity</button>
+
+        <section className="grid gap-3 p-4 md:grid-cols-4">
+          <MetricCard label="Total tracked" value={`${total}`} accent="text-cyan-100" detail="Saved in workspace" />
+          <MetricCard label="Active pipeline" value={`${activePipeline}`} accent="text-emerald-100" detail="Applied or interviewing" />
+          <MetricCard label="OA/Interview" value={`${interviews}`} accent="text-amber-100" detail="Needs preparation" />
+          <MetricCard label="Closed" value={`${closed}`} accent="text-rose-100" detail="Archived outcome" />
+        </section>
       </header>
 
-      <section className="grid gap-4 md:grid-cols-4">
-        <MetricCard label="Total" value={`${total}`} />
-        <MetricCard label="Applied" value={`${applied}`} />
-        <MetricCard label="OA/Interview" value={`${interviews}`} />
-        <MetricCard label="Better Luck" value={`${closed}`} accent="text-rose-300" />
-      </section>
-
-      <form onSubmit={runSearch} className="grid gap-2 rounded-2xl border border-zinc-800 bg-zinc-900/65 p-3 md:grid-cols-[1fr_200px_auto]">
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by company or link" className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm" />
-        <select value={period} onChange={async (e) => { const next = e.target.value as (typeof periodOptions)[number]["value"]; setPeriod(next); await loadOpportunities(query, next); }} className="rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200">
+      <form onSubmit={runSearch} className="grid gap-3 rounded-2xl border border-white/10 bg-zinc-950/70 p-3 shadow-xl backdrop-blur md:grid-cols-[1fr_210px_auto]">
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search company, role, or job link" className="h-11 w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-4 text-sm text-zinc-100 placeholder:text-zinc-500 transition focus:border-cyan-300" />
+        <select value={period} onChange={async (e) => { const next = e.target.value as (typeof periodOptions)[number]["value"]; setPeriod(next); await loadOpportunities(query, next); }} className="h-11 rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 text-sm text-zinc-200 transition focus:border-cyan-300">
           {periodOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
         </select>
-        <button className="rounded-xl bg-indigo-500 px-4 py-2 text-sm font-medium text-white">Search</button>
+        <button className="h-11 rounded-xl bg-cyan-300 px-5 text-sm font-bold text-zinc-950 transition hover:bg-cyan-200">Search</button>
       </form>
 
       <section className="grid gap-4 lg:grid-cols-4">
         {KANBAN_STATUSES.map((status) => (
-          <div key={status} onDragOver={(e) => e.preventDefault()} onDrop={async () => { if (draggingId) { await moveStatus(draggingId, status); setDraggingId(null); } }} className="min-h-[360px] rounded-2xl border border-zinc-800 bg-zinc-900/60 p-3">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-zinc-200">{statusLabel[status]}</h2>
-              <span className="rounded-full bg-zinc-800 px-2.5 py-1 text-xs text-zinc-300">{byStatus[status].length}</span>
+          <div key={status} onDragOver={(e) => e.preventDefault()} onDrop={async () => { if (draggingId) { await moveStatus(draggingId, status); setDraggingId(null); } }} className={`min-h-[420px] rounded-2xl border bg-zinc-950/65 p-3 shadow-xl backdrop-blur ${statusMeta[status].column}`}>
+            <div className="mb-3 overflow-hidden rounded-xl border border-white/10 bg-zinc-950/70">
+              <div className={`h-1 bg-gradient-to-r ${statusMeta[status].accent}`} />
+              <div className="flex items-center justify-between px-3 py-3">
+                <div>
+                  <h2 className="text-sm font-semibold text-zinc-100">{statusLabel[status]}</h2>
+                  <p className="text-[11px] text-zinc-500">{statusMeta[status].label}</p>
+                </div>
+                <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusMeta[status].badge}`}>{byStatus[status].length}</span>
+              </div>
             </div>
             <div className="space-y-2">
               {byStatus[status].map((item) => (
-                <button key={item.id} draggable onDragStart={() => setDraggingId(item.id)} onClick={() => setActiveId(item.id)} className="w-full rounded-xl border border-zinc-700/80 bg-zinc-900 p-3 text-left transition hover:-translate-y-0.5 hover:border-indigo-400/60">
-                  <p className="text-sm font-medium text-zinc-100">{item.roleTitle}</p>
-                  <p className="text-xs text-zinc-400">{item.companyName}</p>
-                  <p className="mt-1 truncate text-[11px] text-zinc-500">{item.jobUrl ?? "No URL"}</p>
+                <button key={item.id} draggable onDragStart={() => setDraggingId(item.id)} onClick={() => setActiveId(item.id)} className="group w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-900/85 text-left shadow-[0_10px_30px_rgba(0,0,0,.18)] transition hover:-translate-y-0.5 hover:border-cyan-300/60 hover:bg-zinc-900">
+                  <div className={`h-1 bg-gradient-to-r ${statusMeta[item.status].accent}`} />
+                  <div className="p-3">
+                    <div className="mb-3 flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="line-clamp-2 text-sm font-semibold leading-snug text-zinc-100">{item.roleTitle}</p>
+                        <p className="mt-1 text-xs text-zinc-400">{item.companyName}</p>
+                      </div>
+                      <span className="shrink-0 rounded-full border border-zinc-700 bg-zinc-950 px-2 py-1 text-[10px] text-zinc-400">{item.retentionDays}d</span>
+                    </div>
+                    <p className="truncate rounded-lg border border-zinc-800 bg-zinc-950/80 px-2 py-1.5 text-[11px] text-zinc-500">{item.jobUrl ?? "No URL saved"}</p>
+                    <div className="mt-3 flex items-center justify-between text-[11px] text-zinc-500">
+                      <span>{formatShortDate(item.createdAt)}</span>
+                      <span className="text-cyan-200 opacity-0 transition group-hover:opacity-100">Open</span>
+                    </div>
+                  </div>
                 </button>
               ))}
+              {byStatus[status].length === 0 && (
+                <div className="rounded-xl border border-dashed border-zinc-700/80 bg-zinc-950/50 p-4 text-center text-sm text-zinc-500">
+                  Drop opportunities here
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -239,11 +299,21 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
             </div>
 
             <div className="flex gap-2">
-              <button type="button" onClick={() => deleteOpportunity(active.id)} className="w-full rounded-xl bg-rose-500 px-3 py-2 text-sm font-medium text-white">Delete</button>
+              <button type="button" onClick={() => setDeleteOpportunityId(active.id)} className="w-full rounded-xl bg-rose-500 px-3 py-2 text-sm font-medium text-white">Delete</button>
               <button disabled={saving} className="w-full rounded-xl bg-emerald-500 px-3 py-2 text-sm font-medium text-zinc-900 disabled:opacity-50">{saving ? "Saving..." : "Save Changes"}</button>
             </div>
           </form>
         </Modal>
+      )}
+
+      {deleteTarget && (
+        <ConfirmModal
+          title="Delete opportunity?"
+          body={`This will permanently remove ${deleteTarget.roleTitle} at ${deleteTarget.companyName}.`}
+          confirmLabel="Delete opportunity"
+          onCancel={() => setDeleteOpportunityId(null)}
+          onConfirm={() => deleteOpportunity(deleteTarget.id)}
+        />
       )}
 
       {showAddModal && (
@@ -285,30 +355,70 @@ function Field({ label, name, defaultValue }: { label: string; name: string; def
   return (
     <label className="block text-xs text-zinc-400">
       {label}
-      <input required={name !== "jobUrl"} name={name} defaultValue={defaultValue} className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-900 px-2 py-2 text-sm text-zinc-100" />
+      <input required={name !== "jobUrl"} name={name} defaultValue={defaultValue} className="mt-1 h-10 w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 text-sm text-zinc-100 transition focus:border-cyan-300" />
     </label>
   );
 }
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-700 bg-zinc-950 p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-zinc-100">{title}</h3>
-          <button onClick={onClose} className="text-sm text-zinc-400 hover:text-zinc-200">Close</button>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/75 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-2xl">
+        <div className="border-b border-white/10 bg-zinc-900/80 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-zinc-100">{title}</h3>
+            <button onClick={onClose} className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400 transition hover:border-zinc-500 hover:text-zinc-100">Close</button>
+          </div>
         </div>
-        {children}
+        <div className="p-4">{children}</div>
       </div>
     </div>
   );
 }
 
-function MetricCard({ label, value, accent = "text-zinc-100" }: { label: string; value: string; accent?: string }) {
+function ConfirmModal({
+  title,
+  body,
+  confirmLabel,
+  onCancel,
+  onConfirm,
+}: {
+  title: string;
+  body: string;
+  confirmLabel: string;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/65 p-4">
-      <p className="text-xs uppercase tracking-wider text-zinc-400">{label}</p>
-      <p className={`mt-2 text-2xl font-semibold ${accent}`}>{value}</p>
+    <div className="fixed inset-0 z-[70] grid place-items-center bg-black/75 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-950 p-4 shadow-2xl">
+        <h3 className="text-sm font-semibold text-zinc-100">{title}</h3>
+        <p className="mt-2 text-sm text-zinc-400">{body}</p>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <button type="button" onClick={onCancel} className="rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100">
+            Cancel
+          </button>
+          <button type="button" onClick={onConfirm} className="rounded-xl bg-rose-500 px-3 py-2 text-sm font-medium text-white">
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
     </div>
   );
+}
+
+function MetricCard({ label, value, detail, accent = "text-zinc-100" }: { label: string; value: string; detail: string; accent?: string }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-zinc-950/65 p-4 shadow-[0_12px_36px_rgba(0,0,0,.18)]">
+      <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{label}</p>
+      <p className={`mt-2 text-3xl font-semibold ${accent}`}>{value}</p>
+      <p className="mt-1 text-xs text-zinc-500">{detail}</p>
+    </div>
+  );
+}
+
+function formatShortDate(value: Date | string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "No date";
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
