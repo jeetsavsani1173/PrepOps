@@ -912,12 +912,14 @@ function formatDisplayDate(value?: Date | string | null): string {
   if (!value) return "Not scheduled";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Not scheduled";
-  return date.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = months[date.getMonth()];
+  const day = date.getDate();
+  const hour = date.getHours();
+  const minute = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const hour12 = hour % 12 || 12;
+  return `${month} ${day}, ${hour12}:${minute} ${ampm}`;
 }
 
 function isDue(value?: Date | string | null): boolean {

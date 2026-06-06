@@ -420,5 +420,6 @@ function MetricCard({ label, value, detail, accent = "text-zinc-100" }: { label:
 function formatShortDate(value: Date | string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "No date";
-  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${months[date.getMonth()]} ${date.getDate()}`;
 }
