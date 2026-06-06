@@ -43,3 +43,9 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# SQLite databases
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
