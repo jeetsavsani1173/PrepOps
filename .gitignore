@@ -49,3 +49,7 @@ yarn-error.log*
 *.db-journal
 *.db-shm
 *.db-wal
+
+# storage
+/storage
+

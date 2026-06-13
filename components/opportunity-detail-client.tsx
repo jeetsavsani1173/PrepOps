@@ -40,16 +40,36 @@ const referralStatuses: ReferralStatus[] = [
   "CLOSED",
 ];
 
+type Toast = {
+  id: number;
+  message: string;
+  type: "success" | "error" | "warning";
+};
+
 export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Props) {
   const [opportunity, setOpportunity] = useState(initial);
   const [referrals, setReferrals] = useState<ReferralWithFollowUps[]>(initial.referralRequests ?? []);
   const [saving, setSaving] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [runningAi, setRunningAi] = useState(false);
+  const [generatingMessageId, setGeneratingMessageId] = useState<string | null>(null);
   const [savingReferral, setSavingReferral] = useState(false);
   const [copiedReferralId, setCopiedReferralId] = useState<string>("");
   const [tab, setTab] = useState<DetailTab>("overview");
   const [copiedSkill, setCopiedSkill] = useState<string>("");
   const [deleteReferralId, setDeleteReferralId] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const toastCounter = useRef(1);
+
+  function notify(message: string, type: Toast["type"]) {
+    try {
+      const id = toastCounter.current++;
+      setToasts((prev) => [...prev, { id, message, type }]);
+      setTimeout(() => setToasts((prev) => prev.filter((toast) => toast.id !== id)), 4000);
+    } catch {
+      window.alert(message);
+    }
+  }
 
   const requiredSkills = useMemo(() => splitSkills(opportunity.requiredSkills), [opportunity.requiredSkills]);
   const preferredSkills = useMemo(() => splitSkills(opportunity.preferredSkills), [opportunity.preferredSkills]);
@@ -73,12 +93,13 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
     });
     const json = await res.json();
     setSaving(false);
-    if (!res.ok) return window.alert(json.error ?? "Failed to save");
+    if (!res.ok) return notify(json.error ?? "Failed to save", "error");
     setOpportunity(json.data);
+    notify("Changes saved successfully.", "success");
   }
 
   async function analyze() {
-    if (!opportunity.jobUrl) return window.alert("Add a valid job URL first.");
+    if (!opportunity.jobUrl) return notify("Add a valid job URL first.", "warning");
     setAnalyzing(true);
     const res = await fetch("/api/scrape-job", {
       method: "POST",
@@ -87,11 +108,82 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
     });
     const json = await res.json();
     setAnalyzing(false);
-    if (!res.ok) return window.alert(json.error ?? "Analysis failed");
+    if (!res.ok) return notify(json.error ?? "Analysis failed", "error");
 
     const refreshed = await fetch(`/api/opportunities/${opportunity.id}`);
     const refreshedJson = await refreshed.json();
-    if (refreshed.ok) setOpportunity(refreshedJson.data);
+    if (refreshed.ok) {
+      setOpportunity(refreshedJson.data);
+      notify("Job description scraped successfully.", "success");
+    }
+  }
+
+  async function runAiAnalysis() {
+    setRunningAi(true);
+    try {
+      const res = await fetch(`/api/opportunities/${opportunity.id}/analyze`, {
+        method: "POST",
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        const isConfigError = 
+          json.error?.includes("GEMINI_API_KEY") || 
+          json.error?.includes("AI features are disabled") || 
+          json.error?.includes("quota exceeded") ||
+          json.error?.includes("Quota exceeded") ||
+          res.status === 429 ||
+          res.status === 403 ||
+          json.detail?.includes("GEMINI_API_KEY");
+        if (isConfigError) {
+          notify(json.error ?? "API Key not provided. Set GEMINI_API_KEY in your .env file.", "warning");
+        } else {
+          notify(json.error ?? "AI Analysis failed", "error");
+        }
+      } else {
+        setOpportunity(json.data);
+        notify("AI analysis complete! Match score and recommendations have been updated.", "success");
+      }
+    } catch (err) {
+      notify(`AI Analysis failed: ${err}`, "error");
+    } finally {
+      setRunningAi(false);
+    }
+  }
+
+  async function generateReferralMessage(referralId: string) {
+    setGeneratingMessageId(referralId);
+    try {
+      const res = await fetch("/api/ai/referral-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ opportunityId: opportunity.id, referralId }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        const isConfigError = 
+          json.error?.includes("GEMINI_API_KEY") || 
+          json.error?.includes("AI features are disabled") || 
+          json.error?.includes("quota exceeded") ||
+          json.error?.includes("Quota exceeded") ||
+          res.status === 429 ||
+          res.status === 403 ||
+          json.detail?.includes("GEMINI_API_KEY");
+        if (isConfigError) {
+          notify(json.error ?? "API Key not provided. Set GEMINI_API_KEY in your .env file.", "warning");
+        } else {
+          notify(json.error ?? "Failed to generate message", "error");
+        }
+      } else {
+        setReferrals((prev) =>
+          prev.map((item) => (item.id === referralId ? json.data : item))
+        );
+        notify("AI Referral Message generated and saved!", "success");
+      }
+    } catch (err) {
+      notify(`Generation failed: ${err}`, "error");
+    } finally {
+      setGeneratingMessageId(null);
+    }
   }
 
   async function copySkill(skill: string) {
@@ -99,8 +191,9 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
       await navigator.clipboard.writeText(skill);
       setCopiedSkill(skill);
       setTimeout(() => setCopiedSkill(""), 1200);
+      notify(`Copied skill to clipboard: ${skill}`, "success");
     } catch {
-      window.alert(`Copy failed: ${skill}`);
+      notify(`Copy failed: ${skill}`, "error");
     }
   }
 
@@ -127,8 +220,9 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
     });
     const json = await res.json();
     setSavingReferral(false);
-    if (!res.ok) return window.alert(json.error ?? "Failed to create referral");
+    if (!res.ok) return notify(json.error ?? "Failed to create referral", "error");
     setReferrals((prev) => [json.data, ...prev]);
+    notify("Referral request created.", "success");
     form.reset();
   }
 
@@ -139,14 +233,16 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
       body: JSON.stringify(payload),
     });
     const json = await res.json();
-    if (!res.ok) return window.alert(json.error ?? "Failed to update referral");
+    if (!res.ok) return notify(json.error ?? "Failed to update referral", "error");
     setReferrals((prev) => prev.map((item) => (item.id === id ? json.data : item)));
+    notify("Referral updated.", "success");
   }
 
   async function deleteReferral(id: string) {
     const res = await fetch(`/api/referrals/${id}`, { method: "DELETE" });
-    if (!res.ok) return window.alert("Failed to delete referral");
+    if (!res.ok) return notify("Failed to delete referral", "error");
     setReferrals((prev) => prev.filter((item) => item.id !== id));
+    notify("Referral deleted.", "success");
     setDeleteReferralId(null);
   }
 
@@ -164,8 +260,9 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
       }),
     });
     const json = await res.json();
-    if (!res.ok) return window.alert(json.error ?? "Failed to add follow-up");
+    if (!res.ok) return notify(json.error ?? "Failed to add follow-up", "error");
     setReferrals((prev) => prev.map((item) => (item.id === referralId ? json.data : item)));
+    notify("Follow-up added.", "success");
     form.reset();
   }
 
@@ -179,8 +276,9 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
       await navigator.clipboard.writeText(message);
       setCopiedReferralId(`${referral.id}-${mode}`);
       setTimeout(() => setCopiedReferralId(""), 1200);
+      notify("Message copied to clipboard.", "success");
     } catch {
-      window.alert("Copy failed.");
+      notify("Copy failed.", "error");
     }
   }
 
@@ -298,6 +396,14 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
               {opportunity.aiRecommendationReason}
             </p>
           )}
+          <button
+            type="button"
+            onClick={runAiAnalysis}
+            disabled={runningAi}
+            className="mt-4 w-full rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 py-2.5 text-xs font-bold text-white shadow-lg transition hover:from-indigo-400 hover:to-cyan-400 disabled:opacity-50"
+          >
+            {runningAi ? "Computing AI Match..." : "✨ Run AI Match Score"}
+          </button>
         </article>
       </section>
 
@@ -313,6 +419,8 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
           onDelete={setDeleteReferralId}
           onAddFollowUp={addFollowUp}
           onCopyMessage={copyReferralMessage}
+          onGenerateReferralMessage={generateReferralMessage}
+          generatingMessageId={generatingMessageId}
         />
       )}
 
@@ -399,6 +507,67 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
           onConfirm={() => deleteReferral(referralToDelete.id)}
         />
       )}
+
+      <div className="fixed bottom-4 right-4 z-[60] flex w-[350px] flex-col gap-2 pointer-events-none">
+        {toasts.map((toast) => {
+          let borderClass = "";
+          let bgClass = "";
+          let textClass = "";
+          let icon = null;
+
+          if (toast.type === "success") {
+            borderClass = "border-emerald-500/30";
+            bgClass = "bg-zinc-900/95 backdrop-blur-md";
+            textClass = "text-emerald-400";
+            icon = (
+              <svg className="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            );
+          } else if (toast.type === "warning") {
+            borderClass = "border-amber-500/30";
+            bgClass = "bg-zinc-900/95 backdrop-blur-md";
+            textClass = "text-amber-400";
+            icon = (
+              <svg className="h-4 w-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            );
+          } else {
+            borderClass = "border-rose-500/30";
+            bgClass = "bg-zinc-900/95 backdrop-blur-md";
+            textClass = "text-rose-400";
+            icon = (
+              <svg className="h-4 w-4 text-rose-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            );
+          }
+
+          return (
+            <div
+              key={toast.id}
+              className={`pointer-events-auto flex items-start gap-3 rounded-xl border ${borderClass} ${bgClass} p-4 shadow-xl transition-all duration-300 transform translate-y-0 animate-slide-in`}
+              style={{
+                boxShadow: "0 8px 30px rgb(0 0 0 / 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)"
+              }}
+            >
+              <div className="mt-0.5">{icon}</div>
+              <div className="flex-1 text-sm font-medium text-zinc-200">
+                {toast.message}
+              </div>
+              <button
+                onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
+                className="text-zinc-500 hover:text-zinc-300 transition-colors"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </main>
   );
 }
@@ -452,6 +621,8 @@ function ReferralTracker({
   onDelete,
   onAddFollowUp,
   onCopyMessage,
+  onGenerateReferralMessage,
+  generatingMessageId,
 }: {
   companyName: string;
   roleTitle: string;
@@ -463,6 +634,8 @@ function ReferralTracker({
   onDelete: (id: string) => void;
   onAddFollowUp: (event: FormEvent<HTMLFormElement>, referralId: string) => void;
   onCopyMessage: (referral: ReferralWithFollowUps, mode: "initial" | "follow-up") => void;
+  onGenerateReferralMessage: (referralId: string) => void;
+  generatingMessageId: string | null;
 }) {
   const openCount = referrals.filter((referral) => !["REFERRED", "DECLINED", "CLOSED"].includes(referral.status)).length;
   const dueCount = referrals.filter((referral) => isDue(referral.nextFollowUpAt)).length;
@@ -566,6 +739,8 @@ function ReferralTracker({
                     message={referral.initialMessage || buildReferralRequestMessage({ companyName, roleTitle }, referral)}
                     copied={copiedReferralId === `${referral.id}-initial`}
                     onCopy={() => onCopyMessage(referral, "initial")}
+                    onGenerateAi={() => onGenerateReferralMessage(referral.id)}
+                    generating={generatingMessageId === referral.id}
                   />
                   <MessagePanel
                     title="Follow-up"
@@ -615,19 +790,35 @@ function MessagePanel({
   message,
   copied,
   onCopy,
+  onGenerateAi,
+  generating = false,
 }: {
   title: string;
   message: string;
   copied: boolean;
   onCopy: () => void;
+  onGenerateAi?: () => void;
+  generating?: boolean;
 }) {
   return (
     <div className="rounded-xl border border-white/10 bg-zinc-950/75 p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <p className="text-xs font-semibold text-zinc-300">{title}</p>
-        <button type="button" onClick={onCopy} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 transition hover:border-cyan-300 hover:text-cyan-100">
-          {copied ? "Copied" : "Copy"}
-        </button>
+        <div className="flex gap-2">
+          {onGenerateAi && (
+            <button
+              type="button"
+              onClick={onGenerateAi}
+              disabled={generating}
+              className="rounded-lg border border-indigo-500/50 bg-indigo-500/10 px-2 py-1 text-[11px] font-medium text-indigo-200 transition hover:bg-indigo-500/20 disabled:opacity-50 animate-pulse"
+            >
+              {generating ? "Generating..." : "✨ AI Draft"}
+            </button>
+          )}
+          <button type="button" onClick={onCopy} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 transition hover:border-cyan-300 hover:text-cyan-100">
+            {copied ? "Copied" : "Copy"}
+          </button>
+        </div>
       </div>
       <p className="whitespace-pre-wrap text-xs text-zinc-400">{message}</p>
     </div>

@@ -29,3 +29,19 @@ select,
 textarea {
   outline-color: rgba(45, 212, 191, 0.7);
 }
+
+@keyframes slide-in {
+  from {
+    transform: translateY(1rem);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

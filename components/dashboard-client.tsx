@@ -2,7 +2,7 @@
 
 import { Opportunity, OpportunityStatus } from "@prisma/client";
 import Link from "next/link";
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { KANBAN_STATUSES } from "@/lib/constants";
 
 type DashboardClientProps = {
@@ -12,7 +12,7 @@ type DashboardClientProps = {
 type Toast = {
   id: number;
   message: string;
-  type: "success" | "error";
+  type: "success" | "error" | "warning";
 };
 
 const statusLabel: Record<OpportunityStatus, string> = {
@@ -63,12 +63,52 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showResumeModal, setShowResumeModal] = useState(false);
+  const [resumeData, setResumeData] = useState<{ versionName: string; skills: string[]; updatedAt: string } | null>(null);
+  const [uploadingResume, setUploadingResume] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [deleteOpportunityId, setDeleteOpportunityId] = useState<string | null>(null);
   const toastCounter = useRef(1);
 
   const active = opportunities.find((item) => item.id === activeId) ?? null;
+
+  useEffect(() => {
+    fetch("/api/resume/upload")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.data) {
+          setResumeData(json.data);
+        }
+      })
+      .catch((err) => console.error("Failed to load resume", err));
+  }, []);
+
+  async function handleResumeUpload(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const file = formData.get("file") as File | null;
+    if (!file || file.size === 0) return notify("Please select a file to upload", "error");
+
+    setUploadingResume(true);
+    try {
+      const res = await fetch("/api/resume/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        notify(json.error ?? "Failed to upload resume", "error");
+      } else {
+        setResumeData(json.data);
+        notify("Resume parsed and saved successfully.", "success");
+      }
+    } catch (err) {
+      notify(`Upload failed: ${err}`, "error");
+    } finally {
+      setUploadingResume(false);
+    }
+  }
   const deleteTarget = opportunities.find((item) => item.id === deleteOpportunityId) ?? null;
 
   const byStatus = useMemo(
@@ -208,9 +248,14 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
               Keep every opportunity, referral, and next move in one command view.
             </h1>
           </div>
-          <button onClick={() => setShowAddModal(true)} className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-400 px-5 text-sm font-bold text-zinc-950 shadow-[0_14px_34px_rgba(16,185,129,.25)] transition hover:bg-emerald-300">
-            + Add Opportunity
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button onClick={() => setShowResumeModal(true)} className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900 px-5 text-sm font-bold text-zinc-100 transition hover:bg-zinc-800">
+              {resumeData ? "📄 Manage Resume" : "📄 Upload Resume"}
+            </button>
+            <button onClick={() => setShowAddModal(true)} className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-400 px-5 text-sm font-bold text-zinc-950 shadow-[0_14px_34px_rgba(16,185,129,.25)] transition hover:bg-emerald-300">
+              + Add Opportunity
+            </button>
+          </div>
         </div>
 
         <section className="grid gap-3 p-4 md:grid-cols-4">
@@ -330,12 +375,120 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         </Modal>
       )}
 
-      <div className="fixed bottom-4 right-4 z-[60] flex w-[320px] flex-col gap-2">
-        {toasts.map((toast) => (
-          <div key={toast.id} className={`rounded-xl border px-3 py-2 text-sm shadow-lg ${toast.type === "success" ? "border-emerald-500/60 bg-emerald-950/70 text-emerald-100" : "border-rose-500/60 bg-rose-950/70 text-rose-100"}`}>
-            {toast.message}
+      {showResumeModal && (
+        <Modal title="Manage Resume" onClose={() => setShowResumeModal(false)}>
+          <div className="space-y-4">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Current Resume</h4>
+              {resumeData ? (
+                <div className="mt-2 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold text-zinc-100 truncate max-w-[220px]" title={resumeData.versionName}>
+                      {resumeData.versionName}
+                    </p>
+                    <span className="text-[10px] text-zinc-500">
+                      Updated {formatShortDate(resumeData.updatedAt)}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-zinc-500">Skills parsed from resume:</p>
+                  <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pr-1">
+                    {resumeData.skills.length > 0 ? (
+                      resumeData.skills.map((skill) => (
+                        <span key={skill} className="rounded-full bg-indigo-500/10 border border-indigo-500/30 px-2 py-0.5 text-[10px] text-indigo-300">
+                          {skill}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-xs text-zinc-400 italic">No skills extracted</span>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-2 text-sm text-zinc-400 italic">No resume uploaded yet.</p>
+              )}
+            </div>
+
+            <form onSubmit={handleResumeUpload} className="space-y-3">
+              <label className="block text-xs text-zinc-400">
+                Upload New Resume (PDF only)
+                <input
+                  required
+                  type="file"
+                  name="file"
+                  accept=".pdf,application/pdf"
+                  className="mt-1 block w-full text-xs text-zinc-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border file:border-zinc-700 file:bg-zinc-900 file:text-xs file:font-semibold file:text-zinc-200 hover:file:bg-zinc-800"
+                />
+              </label>
+              <button
+                disabled={uploadingResume}
+                className="w-full rounded-xl bg-indigo-500 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+              >
+                {uploadingResume ? "Uploading & Parsing..." : "Upload & Parse"}
+              </button>
+            </form>
           </div>
-        ))}
+        </Modal>
+      )}
+
+      <div className="fixed bottom-4 right-4 z-[60] flex w-[350px] flex-col gap-2 pointer-events-none">
+        {toasts.map((toast) => {
+          let borderClass = "";
+          let bgClass = "";
+          let textClass = "";
+          let icon = null;
+
+          if (toast.type === "success") {
+            borderClass = "border-emerald-500/30";
+            bgClass = "bg-zinc-900/95 backdrop-blur-md";
+            textClass = "text-emerald-400";
+            icon = (
+              <svg className="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            );
+          } else if (toast.type === "warning") {
+            borderClass = "border-amber-500/30";
+            bgClass = "bg-zinc-900/95 backdrop-blur-md";
+            textClass = "text-amber-400";
+            icon = (
+              <svg className="h-4 w-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            );
+          } else {
+            borderClass = "border-rose-500/30";
+            bgClass = "bg-zinc-900/95 backdrop-blur-md";
+            textClass = "text-rose-400";
+            icon = (
+              <svg className="h-4 w-4 text-rose-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            );
+          }
+
+          return (
+            <div
+              key={toast.id}
+              className={`pointer-events-auto flex items-start gap-3 rounded-xl border ${borderClass} ${bgClass} p-4 shadow-xl transition-all duration-300 transform translate-y-0 animate-slide-in`}
+              style={{
+                boxShadow: "0 8px 30px rgb(0 0 0 / 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)"
+              }}
+            >
+              <div className="mt-0.5">{icon}</div>
+              <div className="flex-1 text-sm font-medium text-zinc-200">
+                {toast.message}
+              </div>
+              <button
+                onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
+                className="text-zinc-500 hover:text-zinc-300 transition-colors"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          );
+        })}
       </div>
     </main>
   );

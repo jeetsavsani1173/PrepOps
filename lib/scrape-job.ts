@@ -2,6 +2,11 @@ import { chromium } from "playwright";
 import * as cheerio from "cheerio";
 import { JSDOM } from "jsdom";
 import { Readability } from "@mozilla/readability";
+import { AI_ENABLED } from "./env";
+import { LLMProviderFactory } from "./ai/providers/factory";
+import { prisma } from "./prisma";
+import fs from "fs";
+import path from "path";
 
 export type JobAnalysis = {
   roleTitle: string;
@@ -40,6 +45,46 @@ const skillDictionary = [
 export async function scrapeAndAnalyzeJob(url: string): Promise<JobAnalysis> {
   const { html, text, mode } = await fetchPageContent(url);
   const cleanedText = cleanText(text, html);
+
+  if (AI_ENABLED) {
+    try {
+      const resume = await prisma.resumeSnapshot.findFirst();
+      let resumeText = "";
+      if (resume) {
+        const txtPath = path.join(process.cwd(), "storage", "resumes", "resume.txt");
+        if (fs.existsSync(txtPath)) {
+          resumeText = fs.readFileSync(txtPath, "utf8");
+        } else {
+          resumeText = resume.extractedSkillsText || "";
+        }
+      }
+
+      const provider = LLMProviderFactory.getProvider();
+      const aiResult = await provider.analyzeJob(cleanedText, resumeText);
+
+      return {
+        roleTitle: aiResult.roleTitle,
+        companyName: aiResult.companyName,
+        location: aiResult.location,
+        responsibilities: aiResult.responsibilities,
+        qualifications: aiResult.qualifications,
+        requiredSkills: aiResult.requiredSkills,
+        preferredSkills: aiResult.preferredSkills,
+        experienceLevel: aiResult.experienceLevel,
+        employmentType: aiResult.employmentType,
+        workModel: aiResult.workModel,
+        salary: aiResult.salary,
+        applicationDecision: aiResult.applicationDecision,
+        prepDifficulty: aiResult.prepDifficulty,
+        aiMatchScore: aiResult.aiMatchScore,
+        aiRecommendationReason: `${aiResult.aiRecommendationReason} Source mode: ${mode} (AI).`,
+        cleanedText,
+      };
+    } catch (e) {
+      console.error("AI Job parsing failed, falling back to rules-based:", e);
+    }
+  }
+
   const jsonLd = extractJobPostingJsonLd(html);
 
   const roleTitle = pickRoleTitle(html, cleanedText, jsonLd);
