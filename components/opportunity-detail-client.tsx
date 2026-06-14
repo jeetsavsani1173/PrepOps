@@ -13,6 +13,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { KANBAN_STATUSES } from "@/lib/constants";
+import { ThemeToggle } from "./theme-toggle";
 
 type ReferralWithFollowUps = ReferralRequest & { followUps: ReferralFollowUp[] };
 type OpportunityWithReferrals = Opportunity & {
@@ -293,12 +294,15 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
 
   return (
     <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 p-4 sm:p-6">
-      <header className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/75 shadow-2xl backdrop-blur">
-        <div className="border-b border-white/10 bg-zinc-950/60 px-4 py-3 sm:px-5">
+      <header className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/75 shadow-2xl backdrop-blur">
+        <div className="border-b border-zinc-800 bg-zinc-950/60 px-4 py-3 sm:px-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <Link href="/" className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-3 text-sm font-medium text-zinc-100 transition hover:border-cyan-300/70 hover:bg-zinc-800">
-              <BackIcon /> Back to dashboard
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link href="/" className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-3 text-sm font-medium text-zinc-100 transition hover:border-cyan-300/70 hover:bg-zinc-800">
+                <BackIcon /> Back to dashboard
+              </Link>
+              <ThemeToggle />
+            </div>
             {opportunity.jobUrl && (
               <a href={opportunity.jobUrl} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-2 rounded-full bg-emerald-500 px-4 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400">
                 <ExternalIcon /> Apply
@@ -334,7 +338,7 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
       </header>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <article className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4 shadow-xl backdrop-blur">
+        <article className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4 shadow-xl backdrop-blur">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">Editable profile</p>
@@ -369,13 +373,13 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
           </form>
         </article>
 
-        <article className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4 shadow-xl backdrop-blur">
+        <article className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4 shadow-xl backdrop-blur">
           <div className="mb-4">
             <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">AI signal</p>
             <h2 className="mt-1 text-base font-semibold text-zinc-100">Decision Card</h2>
           </div>
           {typeof opportunity.aiMatchScore === "number" && (
-            <div className="mb-4 rounded-xl border border-white/10 bg-zinc-900/80 p-4">
+            <div className="mb-4 rounded-xl border border-zinc-800 bg-zinc-900/80 p-4">
               <div className="mb-2 flex items-center justify-between text-xs">
                 <span className="text-zinc-400">Match Score</span>
                 <span className="font-semibold text-zinc-100">{opportunity.aiMatchScore}/100</span>
@@ -397,7 +401,7 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
             {hasValue(opportunity.experienceLevel) && <Info label="Experience" value={opportunity.experienceLevel ?? ""} />}
           </div>
           {hasValue(opportunity.aiRecommendationReason) && (
-            <p className="mt-3 rounded-xl border border-white/10 bg-zinc-900/70 p-3 text-xs leading-5 text-zinc-300">
+            <p className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900/70 p-3 text-xs leading-5 text-zinc-300">
               {opportunity.aiRecommendationReason}
             </p>
           )}
@@ -429,8 +433,8 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
         />
       )}
 
-      <section className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4 shadow-xl backdrop-blur">
-        <div className="mb-4 flex flex-wrap gap-2 rounded-xl border border-white/10 bg-zinc-900/60 p-1.5">
+      <section className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4 shadow-xl backdrop-blur">
+        <div className="mb-4 flex flex-wrap gap-2 rounded-xl border border-zinc-800 bg-zinc-900/60 p-1.5">
           {visibleTabs.map((t) => (
             <button
               key={t.id}
@@ -503,7 +507,7 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
 
         {tab === "raw" && (
           hasMeaningfulRaw(opportunity) ? (
-            <article className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 prose prose-invert max-w-none prose-p:my-2 prose-li:my-1 prose-headings:my-2">
+            <article className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 prose prose-zinc dark:prose-invert max-w-none prose-p:my-2 prose-li:my-1 prose-headings:my-2">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdownView}</ReactMarkdown>
             </article>
           ) : null
@@ -649,7 +653,7 @@ function ReferralTracker({
   const dueCount = referrals.filter((referral) => isDue(referral.nextFollowUpAt)).length;
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4 shadow-xl backdrop-blur">
+    <section className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4 shadow-xl backdrop-blur">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">Referral workspace</p>
@@ -663,7 +667,7 @@ function ReferralTracker({
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[420px_1fr]">
-        <form onSubmit={onCreate} className="space-y-3 rounded-xl border border-white/10 bg-zinc-900/70 p-4">
+        <form onSubmit={onCreate} className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
           <h3 className="text-sm font-semibold text-zinc-100">Add Referral Ask</h3>
           <Field label="Person name" name="contactName" value="" />
           <div className="grid gap-3 sm:grid-cols-2">
@@ -701,7 +705,7 @@ function ReferralTracker({
             </div>
           ) : (
             referrals.map((referral) => (
-              <article key={referral.id} className="rounded-xl border border-white/10 bg-zinc-900/75 p-4 shadow-[0_10px_30px_rgba(0,0,0,.18)]">
+              <article key={referral.id} className="rounded-xl border border-zinc-800 bg-zinc-900/75 p-4 shadow-[0_10px_30px_rgba(0,0,0,.18)]">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h3 className="text-sm font-semibold text-zinc-100">{referral.contactName}</h3>
@@ -809,7 +813,7 @@ function MessagePanel({
   generating?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-zinc-950/75 p-3">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-950/75 p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <p className="text-xs font-semibold text-zinc-300">{title}</p>
         <div className="flex gap-2">
@@ -878,7 +882,7 @@ function DatePickerField({
   }
 
   return (
-    <div className="rounded-xl border border-white/10 bg-zinc-950/70 p-2">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-2">
       <label className="block text-xs text-zinc-400">
         {label}
         <input
@@ -932,7 +936,7 @@ function FollowUpCenter({ referrals }: { referrals: ReferralWithFollowUps[] }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
-      <article className="rounded-2xl border border-white/10 bg-zinc-900/70 p-4">
+      <article className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-zinc-100">Scheduled Follow-ups</h3>
           <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-xs text-amber-200">
@@ -946,7 +950,7 @@ function FollowUpCenter({ referrals }: { referrals: ReferralWithFollowUps[] }) {
         ) : (
           <div className="space-y-2">
             {scheduled.map((referral) => (
-              <div key={referral.id} className="rounded-xl border border-white/10 bg-zinc-950/70 p-3">
+              <div key={referral.id} className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium text-zinc-100">{referral.contactName}</p>
@@ -964,7 +968,7 @@ function FollowUpCenter({ referrals }: { referrals: ReferralWithFollowUps[] }) {
         )}
       </article>
 
-      <article className="rounded-2xl border border-white/10 bg-zinc-900/70 p-4">
+      <article className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
         <h3 className="mb-3 text-sm font-semibold text-zinc-100">Follow-up History</h3>
         {history.length === 0 ? (
           <p className="rounded-xl border border-dashed border-zinc-700 bg-zinc-950/70 p-4 text-sm text-zinc-400">
@@ -975,7 +979,7 @@ function FollowUpCenter({ referrals }: { referrals: ReferralWithFollowUps[] }) {
             {history
               .sort((a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime())
               .map((followUp) => (
-                <div key={followUp.id} className="rounded-xl border border-white/10 bg-zinc-950/70 p-3">
+                <div key={followUp.id} className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-3">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-sm font-medium text-zinc-100">{followUp.contactName}</p>
                     <p className="text-xs text-zinc-500">{formatDisplayDate(followUp.sentAt)}</p>
@@ -1177,7 +1181,7 @@ function SkillCard({
   onCopy: (skill: string) => void;
 }) {
   return (
-    <article className="rounded-2xl border border-white/10 bg-zinc-900/70 p-4 shadow-[0_10px_30px_rgba(0,0,0,.16)]">
+    <article className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 shadow-[0_10px_30px_rgba(0,0,0,.16)]">
       <h3 className="text-sm font-semibold text-zinc-100">{title}</h3>
       {skills.length === 0 ? (
         <p className="mt-2 text-xs text-zinc-400">Not available yet</p>
@@ -1220,7 +1224,7 @@ function Textarea({ label, name, rows }: { label: string; name: string; rows: nu
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-zinc-900/70 p-3">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
       <p className="text-[11px] text-zinc-500">{label}</p>
       <p className="mt-1 text-zinc-100">{value}</p>
     </div>
@@ -1229,7 +1233,7 @@ function Info({ label, value }: { label: string; value: string }) {
 
 function DataCard({ title, value, large = false }: { title: string; value?: string | null; large?: boolean }) {
   return (
-    <article className={`rounded-2xl border border-white/10 bg-zinc-900/70 p-4 shadow-[0_10px_30px_rgba(0,0,0,.16)] ${large ? "lg:col-span-2" : ""}`}>
+    <article className={`rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 shadow-[0_10px_30px_rgba(0,0,0,.16)] ${large ? "lg:col-span-2" : ""}`}>
       <h3 className="text-sm font-semibold text-zinc-100">{title}</h3>
       <p className="mt-2 whitespace-pre-wrap text-xs text-zinc-300">{value && value.trim() ? value : ""}</p>
     </article>
@@ -1246,7 +1250,7 @@ function MarkdownDataCard({
   large?: boolean;
 }) {
   return (
-    <article className={`rounded-2xl border border-white/10 bg-zinc-900/70 p-4 shadow-[0_10px_30px_rgba(0,0,0,.16)] ${large ? "lg:col-span-2" : ""}`}>
+    <article className={`rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 shadow-[0_10px_30px_rgba(0,0,0,.16)] ${large ? "lg:col-span-2" : ""}`}>
       <h3 className="text-sm font-semibold text-zinc-100">{title}</h3>
       <div className="mt-2 prose prose-invert max-w-none prose-p:my-1 prose-li:my-1 prose-ul:my-1 prose-headings:my-1">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
@@ -1433,7 +1437,7 @@ function TimelineView({
             {/* Dot */}
             <div className={`absolute -left-6 top-1 h-[10px] w-[10px] rounded-full ring-[3px] ring-zinc-950 ${color.dot}`} />
 
-            <div className="rounded-xl border border-white/[0.06] bg-zinc-900/60 p-4 transition hover:border-white/10">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 transition hover:border-zinc-800">
               <div className="flex flex-wrap items-center gap-2">
                 <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${color.badge}`}>
                   {color.label}

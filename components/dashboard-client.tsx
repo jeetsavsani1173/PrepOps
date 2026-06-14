@@ -4,6 +4,7 @@ import { Opportunity, OpportunityStatus } from "@prisma/client";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { KANBAN_STATUSES } from "@/lib/constants";
+import { ThemeToggle } from "./theme-toggle";
 
 type DashboardClientProps = {
   initialData: Opportunity[];
@@ -234,8 +235,8 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
 
   return (
     <main className="relative mx-auto flex w-full max-w-[1540px] flex-1 flex-col gap-6 p-4 sm:p-6">
-      <header className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 shadow-2xl backdrop-blur">
-        <div className="grid gap-6 border-b border-white/10 bg-[linear-gradient(135deg,rgba(20,184,166,.14),rgba(59,130,246,.08)_42%,rgba(245,158,11,.10))] p-5 lg:grid-cols-[1fr_auto] lg:items-center">
+      <header className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/70 shadow-2xl backdrop-blur">
+        <div className="grid gap-6 border-b border-zinc-800 bg-[linear-gradient(135deg,rgba(20,184,166,.14),rgba(59,130,246,.08)_42%,rgba(245,158,11,.10))] p-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div className="min-w-0">
             <div className="mb-4 flex items-center gap-3">
               <div className="grid h-11 w-11 place-items-center rounded-xl border border-emerald-300/40 bg-emerald-300 text-base font-black text-zinc-950 shadow-[0_0_28px_rgba(16,185,129,.35)]">P</div>
@@ -248,7 +249,8 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
               Keep every opportunity, referral, and next move in one command view.
             </h1>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 items-center">
+            <ThemeToggle />
             <Link href="/analytics" className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900 px-5 text-sm font-bold text-zinc-100 transition hover:bg-zinc-800">
               📊 Analytics
             </Link>
@@ -269,7 +271,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         </section>
       </header>
 
-      <form onSubmit={runSearch} className="grid gap-3 rounded-2xl border border-white/10 bg-zinc-950/70 p-3 shadow-xl backdrop-blur md:grid-cols-[1fr_210px_auto]">
+      <form onSubmit={runSearch} className="grid gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 p-3 shadow-xl backdrop-blur md:grid-cols-[1fr_210px_auto]">
         <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search company, role, or job link" className="h-11 w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-4 text-sm text-zinc-100 placeholder:text-zinc-500 transition focus:border-cyan-300" />
         <select value={period} onChange={async (e) => { const next = e.target.value as (typeof periodOptions)[number]["value"]; setPeriod(next); await loadOpportunities(query, next); }} className="h-11 rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 text-sm text-zinc-200 transition focus:border-cyan-300">
           {periodOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
@@ -280,7 +282,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
       <section className="grid gap-4 lg:grid-cols-4">
         {KANBAN_STATUSES.map((status) => (
           <div key={status} onDragOver={(e) => e.preventDefault()} onDrop={async () => { if (draggingId) { await moveStatus(draggingId, status); setDraggingId(null); } }} className={`min-h-[420px] rounded-2xl border bg-zinc-950/65 p-3 shadow-xl backdrop-blur ${statusMeta[status].column}`}>
-            <div className="mb-3 overflow-hidden rounded-xl border border-white/10 bg-zinc-950/70">
+            <div className="mb-3 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/70">
               <div className={`h-1 bg-gradient-to-r ${statusMeta[status].accent}`} />
               <div className="flex items-center justify-between px-3 py-3">
                 <div>
@@ -292,7 +294,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
             </div>
             <div className="space-y-2">
               {byStatus[status].map((item) => (
-                <button key={item.id} draggable onDragStart={() => setDraggingId(item.id)} onClick={() => setActiveId(item.id)} className="group w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-900/85 text-left shadow-[0_10px_30px_rgba(0,0,0,.18)] transition hover:-translate-y-0.5 hover:border-cyan-300/60 hover:bg-zinc-900">
+                <button key={item.id} draggable onDragStart={() => setDraggingId(item.id)} onClick={() => setActiveId(item.id)} className="group w-full overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/85 text-left shadow-[0_10px_30px_rgba(0,0,0,.18)] transition hover:-translate-y-0.5 hover:border-cyan-300/60 hover:bg-zinc-900">
                   <div className={`h-1 bg-gradient-to-r ${statusMeta[item.status].accent}`} />
                   <div className="p-3">
                     <div className="mb-3 flex items-start justify-between gap-2">
@@ -515,8 +517,8 @@ function Field({ label, name, defaultValue }: { label: string; name: string; def
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/75 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-2xl">
-        <div className="border-b border-white/10 bg-zinc-900/80 px-4 py-3">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl">
+        <div className="border-b border-zinc-800 bg-zinc-900/80 px-4 py-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-zinc-100">{title}</h3>
             <button onClick={onClose} className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400 transition hover:border-zinc-500 hover:text-zinc-100">Close</button>
@@ -543,7 +545,7 @@ function ConfirmModal({
 }) {
   return (
     <div className="fixed inset-0 z-[70] grid place-items-center bg-black/75 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-950 p-4 shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl">
         <h3 className="text-sm font-semibold text-zinc-100">{title}</h3>
         <p className="mt-2 text-sm text-zinc-400">{body}</p>
         <div className="mt-4 grid grid-cols-2 gap-2">
@@ -561,7 +563,7 @@ function ConfirmModal({
 
 function MetricCard({ label, value, detail, accent = "text-zinc-100" }: { label: string; value: string; detail: string; accent?: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-zinc-950/65 p-4 shadow-[0_12px_36px_rgba(0,0,0,.18)]">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-950/65 p-4 shadow-[0_12px_36px_rgba(0,0,0,.18)]">
       <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{label}</p>
       <p className={`mt-2 text-3xl font-semibold ${accent}`}>{value}</p>
       <p className="mt-1 text-xs text-zinc-500">{detail}</p>

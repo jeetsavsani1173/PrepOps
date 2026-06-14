@@ -1,25 +1,92 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #09090b;
-  --foreground: #f4f4f5;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+:root.dark, .dark {
+  color-scheme: dark;
+}
+
+@theme {
+  --color-background: light-dark(#f8fafc, #09090b);
+  --color-foreground: light-dark(#0f172a, #f4f4f5);
+
+  --color-zinc-950: light-dark(#ffffff, #09090b);
+  --color-zinc-900: light-dark(#f8fafc, #18181b);
+  --color-zinc-800: light-dark(#f1f5f9, #27272a);
+  --color-zinc-700: light-dark(#e2e8f0, #3f3f46);
+  --color-zinc-600: light-dark(#cbd5e1, #52525b);
+  --color-zinc-500: light-dark(#64748b, #71717a);
+  --color-zinc-400: light-dark(#475569, #a1a1aa);
+  --color-zinc-300: light-dark(#334155, #d4d4d8);
+  --color-zinc-200: light-dark(#1e293b, #e4e4e7);
+  --color-zinc-100: light-dark(#0f172a, #f4f4f5);
+  --color-zinc-50:  light-dark(#09090b, #fafafa);
+
+  --color-cyan-100: light-dark(#0891b2, #cffafe);
+  --color-cyan-200: light-dark(#0e7490, #a5f3fc);
+  --color-cyan-300: light-dark(#0e7490, #67e8f9);
+  --color-cyan-400: light-dark(#0891b2, #22d3ee);
+  --color-cyan-500: light-dark(#0891b2, #06b6d4);
+
+  --color-emerald-100: light-dark(#059669, #d1fae5);
+  --color-emerald-200: light-dark(#047857, #a7f3d0);
+  --color-emerald-300: light-dark(#047857, #6ee7b7);
+  --color-emerald-400: light-dark(#059669, #34d399);
+  --color-emerald-500: light-dark(#059669, #10b981);
+
+  --color-amber-100: light-dark(#d97706, #fef3c7);
+  --color-amber-200: light-dark(#b45309, #fde68a);
+  --color-amber-300: light-dark(#b45309, #fcd34d);
+  --color-amber-400: light-dark(#d97706, #fbbf24);
+  --color-amber-500: light-dark(#d97706, #f59e0b);
+
+  --color-rose-100: light-dark(#e11d48, #ffe4e6);
+  --color-rose-200: light-dark(#be123c, #fecdd3);
+  --color-rose-300: light-dark(#be123c, #fca5a5);
+  --color-rose-400: light-dark(#e11d48, #fb7185);
+  --color-rose-500: light-dark(#e11d48, #f43f5e);
+
+  --color-indigo-100: light-dark(#4f46e5, #e0e7ff);
+  --color-indigo-200: light-dark(#4338ca, #c7d2fe);
+  --color-indigo-300: light-dark(#4338ca, #a5b4fc);
+  --color-indigo-400: light-dark(#4f46e5, #818cf8);
+  --color-indigo-500: light-dark(#4f46e5, #6366f1);
+
   --font-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
 }
 
 body {
   min-height: 100vh;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(135deg, #08090d 0%, #111827 42%, #0f172a 68%, #101114 100%);
-  background-size: 42px 42px, 42px 42px, auto;
-  color: var(--foreground);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  background-color: #fafafa;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, rgba(20, 184, 166, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.03) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.03) 0px, transparent 50%),
+    linear-gradient(rgba(15, 23, 42, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.012) 1px, transparent 1px);
+  background-size: auto, auto, auto, auto, auto, 40px 40px, 40px 40px;
+  color: var(--color-foreground);
+}
+
+.dark body {
+  background-color: #030303;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, rgba(20, 184, 166, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.12) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.06) 0px, transparent 50%),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: auto, auto, auto, auto, auto, 40px 40px, 40px 40px;
 }
 
 button,
@@ -28,6 +95,11 @@ input,
 select,
 textarea {
   outline-color: rgba(45, 212, 191, 0.7);
+}
+
+html {
+  scrollbar-color: light-dark(#cbd5e1, #3f3f46) transparent;
+  transition: color-scheme 0.3s ease;
 }
 
 @keyframes slide-in {
@@ -44,4 +116,3 @@ textarea {
 .animate-slide-in {
   animation: slide-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-

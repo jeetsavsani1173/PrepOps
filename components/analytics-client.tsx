@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "./theme-toggle";
 
 type AnalyticsData = {
   funnel: { saved: number; applied: number; interview: number; closed: number };
@@ -51,8 +52,8 @@ export function AnalyticsClient() {
   return (
     <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 p-4 sm:p-6">
       {/* Header */}
-      <header className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 shadow-2xl backdrop-blur">
-        <div className="border-b border-white/10 bg-[linear-gradient(135deg,rgba(124,58,237,.12),rgba(59,130,246,.08)_42%,rgba(245,158,11,.08))] p-5">
+      <header className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/70 shadow-2xl backdrop-blur">
+        <div className="border-b border-zinc-800 bg-[linear-gradient(135deg,rgba(124,58,237,.12),rgba(59,130,246,.08)_42%,rgba(245,158,11,.08))] p-5">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Link
@@ -71,21 +72,24 @@ export function AnalyticsClient() {
               </div>
             </div>
 
-            <select
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              className="h-10 rounded-xl border border-zinc-700 bg-zinc-900/90 px-4 text-sm text-zinc-200 transition focus:border-cyan-300"
-            >
-              {periodOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <select
+                value={period}
+                onChange={(e) => setPeriod(e.target.value)}
+                className="h-10 rounded-xl border border-zinc-700 bg-zinc-900/90 px-4 text-sm text-zinc-200 transition focus:border-cyan-300"
+              >
+                {periodOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </header>
 
       {loading || !data ? (
-        <div className="grid place-items-center rounded-2xl border border-white/10 bg-zinc-950/70 p-16">
+        <div className="grid place-items-center rounded-2xl border border-zinc-800 bg-zinc-950/70 p-16">
           <div className="text-center">
             <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-400" />
             <p className="text-sm text-zinc-500">Loading analytics...</p>
@@ -136,7 +140,7 @@ export function AnalyticsClient() {
 
           {/* Funnel + Conversion */}
           <section className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/70 p-5 shadow-xl backdrop-blur">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5 shadow-xl backdrop-blur">
               <SectionTitle label="Pipeline" title="Funnel" />
               <div className="mt-4 space-y-3">
                 <FunnelBar label="Saved" count={data.funnel.saved} total={data.totalOpportunities} color="bg-cyan-400" />
@@ -145,11 +149,11 @@ export function AnalyticsClient() {
                 <FunnelBar label="Closed" count={data.funnel.closed} total={data.totalOpportunities} color="bg-rose-400" />
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-white/10 bg-zinc-900/70 p-3 text-center">
+                <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3 text-center">
                   <p className="text-2xl font-bold text-emerald-300">{data.conversionRates.savedToApplied}%</p>
                   <p className="mt-1 text-[11px] text-zinc-500">Saved → Applied</p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-zinc-900/70 p-3 text-center">
+                <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3 text-center">
                   <p className="text-2xl font-bold text-amber-300">{data.conversionRates.appliedToInterview}%</p>
                   <p className="mt-1 text-[11px] text-zinc-500">Applied → Interview</p>
                 </div>
@@ -157,7 +161,7 @@ export function AnalyticsClient() {
             </div>
 
             {/* Avg Time in Stage */}
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/70 p-5 shadow-xl backdrop-blur">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5 shadow-xl backdrop-blur">
               <SectionTitle label="Velocity" title="Avg Time in Stage" />
               <div className="mt-4 grid grid-cols-3 gap-3">
                 <TimeCard label="Saved" days={data.avgTimeInStage.SAVED} color="text-cyan-300" />
@@ -176,7 +180,7 @@ export function AnalyticsClient() {
           {/* Weekly Activity + Top Skills */}
           <section className="grid gap-4 lg:grid-cols-2">
             {/* Weekly Activity */}
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/70 p-5 shadow-xl backdrop-blur">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5 shadow-xl backdrop-blur">
               <SectionTitle label="Activity" title="Weekly Applications" />
               <div className="mt-4 flex h-[180px] items-end gap-2">
                 {data.weeklyActivity.map((w) => {
@@ -199,7 +203,7 @@ export function AnalyticsClient() {
             </div>
 
             {/* Top Skills */}
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/70 p-5 shadow-xl backdrop-blur">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5 shadow-xl backdrop-blur">
               <SectionTitle label="Demand" title="Top Skills Required" />
               {data.topSkills.length > 0 ? (
                 <div className="mt-4 space-y-2.5">
@@ -244,7 +248,7 @@ function SectionTitle({ label, title }: { label: string; title: string }) {
 
 function StatCard({ label, value, accent, detail }: { label: string; value: string; accent: string; detail: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-zinc-950/65 p-4 shadow-[0_12px_36px_rgba(0,0,0,.18)]">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-950/65 p-4 shadow-[0_12px_36px_rgba(0,0,0,.18)]">
       <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{label}</p>
       <p className={`mt-2 text-3xl font-semibold ${accent}`}>{value}</p>
       <p className="mt-1 text-xs text-zinc-500">{detail}</p>
@@ -272,7 +276,7 @@ function FunnelBar({ label, count, total, color }: { label: string; count: numbe
 
 function TimeCard({ label, days, color }: { label: string; days: number; color: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-zinc-900/70 p-4 text-center">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4 text-center">
       <p className={`text-2xl font-bold ${color}`}>{days > 0 ? days : "—"}</p>
       <p className="mt-1 text-[11px] text-zinc-500">days in {label}</p>
     </div>
