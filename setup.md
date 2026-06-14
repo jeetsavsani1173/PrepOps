@@ -1,20 +1,20 @@
-# PrepOps Fresh Setup Guide
+# PrepOps Setup Guide
 
-This guide helps you set up PrepOps from scratch on a new machine.
+This guide helps you set up **PrepOps** from scratch on your machine.
+
+---
 
 ## 1. Prerequisites
 
-Install these first:
+Before starting, install the following:
 
-- Node.js `22.x` (recommended)
-- npm `10+`
-- Docker Desktop (or Docker Engine + Compose)
-- Git
+- **Node.js**: `22.x` or later
+- **npm**: `10.x` or later
+- **Docker Desktop**: Required if running inside containers
+- **Git**: To manage dependencies
+- **Google Chrome**: Recommended for extension testing
 
-Optional but useful:
-
-- VS Code
-- Chrome (for extension testing)
+---
 
 ## 2. Clone and Enter Project
 
@@ -23,18 +23,15 @@ git clone <your-repo-url>
 cd PrepOps
 ```
 
-What this does:
-
-- `git clone` downloads the project
-- `cd PrepOps` moves you into the project folder
-
-Verify you are in the right folder:
+Verify you are in the correct directory:
 
 ```bash
-ls
+ls -la
 ```
 
-You should see files like `package.json`, `prisma/`, `app/`, `docker-compose.yml`.
+You should see files like `package.json`, `prisma/`, `app/`, `docker-compose.yml`, and `setup.md`.
+
+---
 
 ## 3. Install Dependencies
 
@@ -42,244 +39,132 @@ You should see files like `package.json`, `prisma/`, `app/`, `docker-compose.yml
 npm install
 ```
 
-What this does:
+This installs all packages (Next.js, Prisma, Tailwind CSS v4, Framer Motion, Playwright, Cheerio, etc.) and automatically runs the `postinstall` script to generate the Prisma database client.
 
-- Installs Next.js, Prisma, React, Tailwind, and all required packages
-- Runs `postinstall` script (`prisma generate`) to create Prisma client
+---
 
-Verify install:
+## 4. Environment Configuration
 
-```bash
-npm -v
-node -v
-```
-
-## 4. Create Environment File
+Copy the example environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-What this does:
+Open `.env` in your editor and configure the variables:
 
-- Creates your local environment file used by Next.js + Prisma
+```env
+DATABASE_URL="file:./prisma/dev.db"
+AI_ENABLED="true"
+AI_PROVIDER="gemini"
+GEMINI_API_KEY="your-gemini-api-key-here"
+GEMINI_MODEL="gemini-2.0-flash"
+REFERRAL_TRACKING_ENABLED="true"
+```
 
-Current default env values:
+---
 
-- `DATABASE_URL="file:./prisma/dev.db"`
-- `AI_ENABLED="false"`
-- `OPENAI_API_KEY=""`
+## 🔑 How to Get a Gemini API Key
 
-Note:
+PrepOps uses the Google Gemini API to analyze job descriptions, parse resumes, match skills, and draft referral outreach messages.
 
-- AI is intentionally optional right now.
-- Keep `AI_ENABLED=false` unless AI phase is implemented.
+1. Go to **[Google AI Studio](https://aistudio.google.com/)**.
+2. Sign in using your Google Account.
+3. Click the blue **"Get API key"** button on the left sidebar.
+4. Click **"Create API key"** (you can link it to an existing Google Cloud project or auto-generate a new one).
+5. Copy the generated key (starts with `AIzaSy...`).
+6. Paste the key into your `.env` file under `GEMINI_API_KEY="..."`.
+7. Configure `GEMINI_MODEL="gemini-2.0-flash"` (or any other free tier model, e.g., `gemini-1.5-flash`).
 
-## 5. Setup Database (SQLite + Prisma)
+---
+
+## 5. Database Setup (SQLite + Prisma)
+
+Generate the local SQLite database, apply migrations, and seed initial mock opportunities:
 
 ```bash
 npx prisma migrate dev
 ```
 
-What this does:
-
-- Creates SQLite DB at `prisma/dev.db` if missing
-- Applies migrations from `prisma/migrations`
-- Regenerates Prisma client
-- Runs seed script (`prisma/seed.mjs`) to add sample opportunities
-
-Verify DB quickly:
+### Explore Database
+To visually inspect the database tables and records, run Prisma Studio:
 
 ```bash
 npx prisma studio
 ```
 
-Then open Prisma Studio URL shown in terminal and confirm data exists in `Opportunity` table.
+Open `http://localhost:5555` in your browser to explore the database.
 
-## 6. Run App Locally (Development)
+---
+
+## 6. Run the Application Locally
+
+Start the development server with hot-reloading:
 
 ```bash
 npm run dev
 ```
 
-What this does:
+Open the application:
+- URL: **`http://localhost:3000`**
 
-- Starts Next.js dev server with hot reload
+---
 
-Open in browser:
+## 7. Docker Production Stack
 
-- `http://localhost:3000`
-
-Expected result:
-
-- Dark dashboard UI with metrics + kanban columns
-
-## 7. API Smoke Tests
-
-Create one opportunity:
-
-```bash
-curl -X POST http://localhost:3000/api/opportunities \
-  -H "Content-Type: application/json" \
-  -d '{
-    "companyName": "Example Corp",
-    "roleTitle": "Backend Engineer",
-    "source": "MANUAL",
-    "jobUrl": "https://example.com/jobs/123"
-  }'
-```
-
-Fetch all opportunities:
-
-```bash
-curl http://localhost:3000/api/opportunities
-```
-
-Test scrape endpoint scaffold:
-
-```bash
-curl -X POST http://localhost:3000/api/scrape-job \
-  -H "Content-Type: application/json" \
-  -d '{"url":"https://example.com/job/123"}'
-```
-
-## 8. Quality Checks
-
-Lint:
-
-```bash
-npm run lint
-```
-
-Production build test:
-
-```bash
-npm run build
-```
-
-What these do:
-
-- `lint` catches code quality/type-style issues
-- `build` confirms app compiles for production
-
-## 9. Docker Setup (Single Command Startup)
-
-Start with build:
+To run the entire application stack (Next.js server + Prisma DB + local volume storage) inside Docker:
 
 ```bash
 docker-compose up --build
 ```
 
-What this does:
+- App URL: `http://localhost:3000`
+- Volumes:
+  - `prepops-db` maps the SQLite database file.
+  - `prepops-storage` maps uploaded resumes.
 
-- Builds app image
-- Starts service `prepops`
-- Maps `localhost:3000 -> container:3000`
-- Mounts persistent volumes:
-  - `prepops-db` for SQLite
-  - `prepops-storage` for resume/assets
-
-Run in detached mode:
-
-```bash
-docker-compose up -d --build
-```
-
-Check logs:
-
-```bash
-docker-compose logs -f
-```
-
-Stop services:
+To stop the services:
 
 ```bash
 docker-compose down
 ```
 
-## 10. Chrome Extension Setup (Scaffold)
+---
 
-1. Open Chrome: `chrome://extensions`
-2. Enable **Developer mode**
-3. Click **Load unpacked**
-4. Select project folder: `extension/`
-5. Open any job page
-6. Click extension popup button **Save To PrepOps**
+## 8. Chrome Extension Setup
 
-What happens now:
+1. Open Google Chrome and navigate to `chrome://extensions`.
+2. Toggle **Developer mode** on in the top-right corner.
+3. Click **Load unpacked** in the top-left corner.
+4. Select the `extension/` folder inside the PrepOps root directory.
+5. Pin the extension. When on a job page, click the extension icon and select **"Save To PrepOps"** to capture and ingest the job description instantly.
 
-- Extension sends page payload to:
-  - `POST http://localhost:3000/api/extension/ingest`
+---
 
-Important:
+## 9. Quality Checks & Verification
 
-- Local app server must be running (`npm run dev` or Docker) before testing extension.
+Verify that your changes compile and pass code quality standardizations:
 
-## 11. Common Problems and Fixes
+- **Linter Checks**: Runs ESLint.
+  ```bash
+  npm run lint
+  ```
+- **Type Checks**: Verifies TypeScript compiles with no errors.
+  ```bash
+  npx tsc --noEmit
+  ```
+- **Production Compilation**: Tests building Next.js webpack artifacts.
+  ```bash
+  npm run build
+  ```
 
-### Problem: `npm install` fails due to network
+---
 
-Try again on stable internet and rerun:
+## 10. Fresh Database Reset
 
-```bash
-npm install
-```
-
-### Problem: Prisma migration fails
-
-Ensure `.env` exists and has valid `DATABASE_URL`.
-
-Then rerun:
-
-```bash
-npx prisma migrate dev
-```
-
-### Problem: Port 3000 already in use
-
-Run on another port:
-
-```bash
-npm run dev -- -p 3001
-```
-
-### Problem: Extension says server not reachable
-
-Ensure backend is running on `http://localhost:3000`.
-
-### Problem: Docker container starts but app not reachable
-
-Check logs:
-
-```bash
-docker-compose logs -f
-```
-
-## 12. Fresh Reset (Local Dev Only)
-
-If you want a clean local DB reset:
+If you need to completely wipe the database and start fresh with default seed data:
 
 ```bash
 rm -f prisma/dev.db
 npx prisma migrate dev
 ```
-
-This recreates DB and reseeds data.
-
-## 13. Current Phase Status
-
-Already implemented:
-
-- Local-first app foundation
-- Prisma schema + migrations + seed
-- Opportunity CRUD APIs
-- Dashboard shell
-- Extension basic ingest flow
-- Docker runtime
-
-Not yet implemented (next phases):
-
-- Full Playwright/Cheerio scraping pipeline
-- AI scoring + recommendations
-- Drag-and-drop kanban status updates
-- Full notes/tasks workspace UX
