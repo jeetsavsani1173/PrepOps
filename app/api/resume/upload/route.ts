@@ -5,6 +5,7 @@ import { AI_ENABLED } from "@/lib/env";
 import { LLMProviderFactory } from "@/lib/ai/providers/factory";
 import fs from "fs";
 import path from "path";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParseModule = require("pdf-parse");
 
 const skillKeywords = [

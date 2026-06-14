@@ -249,6 +249,9 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
             </h1>
           </div>
           <div className="flex flex-wrap gap-3">
+            <Link href="/analytics" className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900 px-5 text-sm font-bold text-zinc-100 transition hover:bg-zinc-800">
+              📊 Analytics
+            </Link>
             <button onClick={() => setShowResumeModal(true)} className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900 px-5 text-sm font-bold text-zinc-100 transition hover:bg-zinc-800">
               {resumeData ? "📄 Manage Resume" : "📄 Upload Resume"}
             </button>
@@ -434,13 +437,11 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         {toasts.map((toast) => {
           let borderClass = "";
           let bgClass = "";
-          let textClass = "";
           let icon = null;
 
           if (toast.type === "success") {
             borderClass = "border-emerald-500/30";
             bgClass = "bg-zinc-900/95 backdrop-blur-md";
-            textClass = "text-emerald-400";
             icon = (
               <svg className="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -449,7 +450,6 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
           } else if (toast.type === "warning") {
             borderClass = "border-amber-500/30";
             bgClass = "bg-zinc-900/95 backdrop-blur-md";
-            textClass = "text-amber-400";
             icon = (
               <svg className="h-4 w-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -458,7 +458,6 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
           } else {
             borderClass = "border-rose-500/30";
             bgClass = "bg-zinc-900/95 backdrop-blur-md";
-            textClass = "text-rose-400";
             icon = (
               <svg className="h-4 w-4 text-rose-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

@@ -13,9 +13,14 @@ export default async function OpportunityPage({
   const { id } = await params;
   const opportunity = await prisma.opportunity.findUnique({
     where: { id },
-    include: REFERRAL_TRACKING_ENABLED
-      ? { referralRequests: { include: { followUps: { orderBy: { sentAt: "desc" } } } } }
-      : undefined,
+    include: {
+      statusHistory: { orderBy: { changedAt: "asc" } },
+      referralRequests: {
+        include: {
+          followUps: { orderBy: { sentAt: "desc" } },
+        },
+      },
+    },
   });
   if (!opportunity) notFound();
 

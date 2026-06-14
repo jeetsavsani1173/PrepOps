@@ -6,6 +6,7 @@ import {
   ReferralFollowUp,
   ReferralRequest,
   ReferralStatus,
+  StatusHistory,
 } from "@prisma/client";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -14,18 +15,22 @@ import remarkGfm from "remark-gfm";
 import { KANBAN_STATUSES } from "@/lib/constants";
 
 type ReferralWithFollowUps = ReferralRequest & { followUps: ReferralFollowUp[] };
-type OpportunityWithReferrals = Opportunity & { referralRequests?: ReferralWithFollowUps[] };
+type OpportunityWithReferrals = Opportunity & {
+  referralRequests?: ReferralWithFollowUps[];
+  statusHistory?: StatusHistory[];
+};
 type Props = {
   initial: OpportunityWithReferrals;
   referralTrackingEnabled: boolean;
 };
-type DetailTab = "overview" | "requirements" | "compensation" | "followUps" | "raw";
+type DetailTab = "overview" | "requirements" | "compensation" | "followUps" | "timeline" | "raw";
 
 const tabs: Array<{ id: DetailTab; label: string; referralOnly?: boolean }> = [
   { id: "overview", label: "Overview" },
   { id: "requirements", label: "Requirements" },
   { id: "compensation", label: "Compensation" },
   { id: "followUps", label: "Follow-ups", referralOnly: true },
+  { id: "timeline", label: "Timeline" },
   { id: "raw", label: "Raw Extract" },
 ];
 
@@ -489,6 +494,13 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
           <FollowUpCenter referrals={referrals} />
         )}
 
+        {tab === "timeline" && (
+          <TimelineView
+            createdAt={opportunity.createdAt}
+            statusHistory={opportunity.statusHistory ?? []}
+          />
+        )}
+
         {tab === "raw" && (
           hasMeaningfulRaw(opportunity) ? (
             <article className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 prose prose-invert max-w-none prose-p:my-2 prose-li:my-1 prose-headings:my-2">
@@ -512,13 +524,11 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
         {toasts.map((toast) => {
           let borderClass = "";
           let bgClass = "";
-          let textClass = "";
           let icon = null;
 
           if (toast.type === "success") {
             borderClass = "border-emerald-500/30";
             bgClass = "bg-zinc-900/95 backdrop-blur-md";
-            textClass = "text-emerald-400";
             icon = (
               <svg className="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -527,7 +537,6 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
           } else if (toast.type === "warning") {
             borderClass = "border-amber-500/30";
             bgClass = "bg-zinc-900/95 backdrop-blur-md";
-            textClass = "text-amber-400";
             icon = (
               <svg className="h-4 w-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -536,7 +545,6 @@ export function OpportunityDetailClient({ initial, referralTrackingEnabled }: Pr
           } else {
             borderClass = "border-rose-500/30";
             bgClass = "bg-zinc-900/95 backdrop-blur-md";
-            textClass = "text-rose-400";
             icon = (
               <svg className="h-4 w-4 text-rose-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1314,5 +1322,146 @@ function BackIcon() {
       <path d="M19 12H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+const STATUS_COLORS: Record<string, { dot: string; line: string; badge: string; label: string }> = {
+  SAVED: { dot: "bg-cyan-400", line: "bg-cyan-400/30", badge: "border-cyan-400/30 bg-cyan-400/10 text-cyan-200", label: "Saved" },
+  APPLIED: { dot: "bg-emerald-400", line: "bg-emerald-400/30", badge: "border-emerald-400/30 bg-emerald-400/10 text-emerald-200", label: "Applied" },
+  INTERVIEW: { dot: "bg-amber-400", line: "bg-amber-400/30", badge: "border-amber-400/30 bg-amber-400/10 text-amber-200", label: "OA / Interview" },
+  BETTER_LUCK_NEXT_TIME: { dot: "bg-rose-400", line: "bg-rose-400/30", badge: "border-rose-400/30 bg-rose-400/10 text-rose-200", label: "Better luck next time" },
+};
+
+function getStatusColor(status: string) {
+  return STATUS_COLORS[status] ?? STATUS_COLORS.SAVED;
+}
+
+function relativeTime(date: Date | string): string {
+  const d = new Date(date);
+  const now = Date.now();
+  const diffMs = now - d.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "1 day ago";
+  if (diffDays < 30) return `${diffDays} days ago`;
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths === 1) return "1 month ago";
+  return `${diffMonths} months ago`;
+}
+
+function daysBetween(a: Date | string, b: Date | string): number {
+  return Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000));
+}
+
+function formatDate(date: Date | string): string {
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return "Unknown";
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+function TimelineView({
+  createdAt,
+  statusHistory,
+}: {
+  createdAt: Date | string;
+  statusHistory: StatusHistory[];
+}) {
+  type TimelineEvent = {
+    id: string;
+    label: string;
+    description: string;
+    timestamp: Date | string;
+    status: string;
+  };
+
+  const events: TimelineEvent[] = [];
+
+  // First event: opportunity created
+  events.push({
+    id: "created",
+    label: "Opportunity created",
+    description: "Added to your pipeline",
+    timestamp: createdAt,
+    status: "SAVED",
+  });
+
+  // Status transitions
+  for (let i = 0; i < statusHistory.length; i++) {
+    const entry = statusHistory[i];
+    if (entry.fromStatus === entry.toStatus && i === 0) continue; // skip initial identical entry
+    const fromColor = getStatusColor(entry.fromStatus);
+    const toColor = getStatusColor(entry.toStatus);
+    events.push({
+      id: entry.id,
+      label: `${fromColor.label} → ${toColor.label}`,
+      description: `Status changed`,
+      timestamp: entry.changedAt,
+      status: entry.toStatus,
+    });
+  }
+
+  // Sort by timestamp ascending
+  events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+  if (events.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/50 p-8 text-center">
+        <p className="text-sm text-zinc-500">No timeline events yet.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative space-y-0 pl-6">
+      {/* Vertical line */}
+      <div className="absolute left-[11px] top-3 bottom-3 w-px bg-zinc-700/50" />
+
+      {events.map((event, idx) => {
+        const color = getStatusColor(event.status);
+        const isLast = idx === events.length - 1;
+        const daysInStage =
+          idx < events.length - 1
+            ? daysBetween(event.timestamp, events[idx + 1].timestamp)
+            : daysBetween(event.timestamp, new Date());
+
+        return (
+          <div key={event.id} className="relative pb-6 last:pb-0">
+            {/* Dot */}
+            <div className={`absolute -left-6 top-1 h-[10px] w-[10px] rounded-full ring-[3px] ring-zinc-950 ${color.dot}`} />
+
+            <div className="rounded-xl border border-white/[0.06] bg-zinc-900/60 p-4 transition hover:border-white/10">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${color.badge}`}>
+                  {color.label}
+                </span>
+                <span className="text-xs text-zinc-500">{formatDate(event.timestamp)}</span>
+                <span className="text-[11px] text-zinc-600">({relativeTime(event.timestamp)})</span>
+              </div>
+
+              <p className="mt-2 text-sm font-medium text-zinc-200">{event.label}</p>
+
+              {/* Days in stage badge */}
+              {(daysInStage > 0 || isLast) && (
+                <div className="mt-2 flex items-center gap-1.5">
+                  <svg className="h-3.5 w-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  <span className="text-[11px] text-zinc-500">
+                    {isLast
+                      ? `${daysInStage} day${daysInStage !== 1 ? "s" : ""} in current stage`
+                      : `${daysInStage} day${daysInStage !== 1 ? "s" : ""} until next transition`}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
