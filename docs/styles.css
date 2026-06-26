@@ -48,6 +48,10 @@ html.light {
   --terminal-text: #f8fafc;
   --blob-opacity: 0.04;
   --ambient-glow: rgba(79, 70, 229, 0.015);
+  --logo-bg-start: #f1f5f9;
+  --logo-bg-end: #cbd5e1;
+  --logo-stroke-primary: #059669;
+  --logo-stroke-secondary: #0891b2;
 }
 
 /* Dark Theme Variables (Default) */
@@ -85,6 +89,10 @@ html.dark {
   --terminal-text: #f4f4f5;
   --blob-opacity: 0.09;
   --ambient-glow: rgba(34, 211, 238, 0.025);
+  --logo-bg-start: #0f172a;
+  --logo-bg-end: #020617;
+  --logo-stroke-primary: #10b981;
+  --logo-stroke-secondary: #3b82f6;
 }
 
 /* ==========================================
@@ -217,17 +225,25 @@ code {
   gap: 0.75rem;
 }
 
-.logo-box {
+.logo-svg {
   width: 2.25rem;
   height: 2.25rem;
-  background: linear-gradient(135deg, #10b981, #3b82f6);
-  color: #030303;
-  font-size: 1.25rem;
-  font-weight: 900;
-  border-radius: var(--border-radius-md);
-  display: grid;
-  place-items: center;
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.25));
+  transition: all var(--transition-fast);
+}
+
+.logo-svg:hover {
+  transform: scale(1.05) rotate(5deg);
+  filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.4));
+}
+
+.logo-cursor {
+  animation: logo-blink 1.2s step-end infinite;
+}
+
+@keyframes logo-blink {
+  from, to { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 .logo-text {
@@ -426,11 +442,11 @@ html.light .moon-icon { display: block; }
   justify-content: center;
 }
 
-/* Button style */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   height: 2.75rem;
   padding: 0 1.5rem;
   border-radius: var(--border-radius-md);
@@ -762,6 +778,14 @@ html.dark .terminal-bar {
 
 .text-zinc-400 {
   color: var(--text-tertiary);
+}
+
+.text-zinc-100 {
+  color: var(--text-primary);
+}
+
+.text-zinc-500 {
+  color: var(--text-secondary);
 }
 
 /* ==========================================
