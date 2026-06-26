@@ -19,7 +19,7 @@ Before starting, install the following:
 ## 2. Clone and Enter Project
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/jeetsavsani1173/PrepOps.git
 cd PrepOps
 ```
 
@@ -29,7 +29,7 @@ Verify you are in the correct directory:
 ls -la
 ```
 
-You should see files like `package.json`, `prisma/`, `app/`, `docker-compose.yml`, and `setup.md`.
+You should see files like `package.json`, `prisma/`, `app/`, `docker-compose.yml`, `showcase/`, and `setup.md`.
 
 ---
 
@@ -141,7 +141,17 @@ docker-compose down
 
 ---
 
-## 9. Quality Checks & Verification
+## 9. Interactive Product Showcase
+
+PrepOps comes with a standalone, premium static showcase and guide to explore features and copy installation commands directly from a terminal simulator interface:
+
+1. Open [showcase/index.html](file:///Users/jeetsavsani/Desktop/Coding/PrepOps/showcase/index.html) in your browser.
+2. Toggle between **Light and Dark themes** using the header control (persists user preference in localStorage).
+3. Interact with the glassmorphic card previews, copy setup snippets from the guide tab panes, and review architecture details.
+
+---
+
+## 10. Quality Checks & Verification
 
 Verify that your changes compile and pass code quality standardizations:
 
@@ -160,7 +170,7 @@ Verify that your changes compile and pass code quality standardizations:
 
 ---
 
-## 10. Fresh Database Reset
+## 11. Fresh Database Reset
 
 If you need to completely wipe the database and start fresh with default seed data:
 

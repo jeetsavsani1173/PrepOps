@@ -37,6 +37,7 @@ All data, resume files, and scraping operations remain strictly on your local ma
 - **Ambient Glow Backgrounds**: Premium mesh backgrounds featuring soft radial color glows (Indigo, Teal, Amber, Blue, Purple) that sit behind layout panels.
 - **Animated Toggler**: A spring-animated toggle button driven by `framer-motion` rotating Sun/Moon SVGs.
 - **Zero FOUC**: A blocking inline script injected inside the `<head>` guarantees theme synchronization before browser rendering, completely eliminating layout flashing.
+- **Product Showcase Landing Site**: A standalone static page ([showcase/index.html](file:///Users/jeetsavsani/Desktop/Coding/PrepOps/showcase/index.html)) illustrating core capabilities, visual Kanban mockup cards, and custom tabbed environment configs.
 
 ---
 

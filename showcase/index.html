@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PrepOps - Local-first, AI-powered job tracking and interview prep command center for software engineers.">
+  <title>PrepOps — Dream Role Command Center</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Blocking script to prevent theme flash (FOUC)
+    (function() {
+      try {
+        const theme = localStorage.getItem('showcase-theme') || 'dark';
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        } else {
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Ambient background glow blobs -->
+  <div class="glow-blob blob-indigo"></div>
+  <div class="glow-blob blob-teal"></div>
+  <div class="glow-blob blob-amber"></div>
+
+  <!-- Header -->
+  <header class="main-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <div class="logo-box">P</div>
+        <div class="logo-text">
+          <span class="logo-title">PrepOps</span>
+          <span class="logo-subtitle">Command Center</span>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="#problem">Problem</a>
+        <a href="#features">Features</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#setup">Setup Guide</a>
+        <a href="#architecture">Architecture</a>
+      </nav>
+      <div class="actions-area">
+        <a href="https://github.com/jeetsavsani1173/PrepOps" target="_blank" rel="noopener noreferrer" class="github-btn" aria-label="GitHub Repository">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+          <!-- Sun icon -->
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2" />
+            <path d="M12 20v2" />
+            <path d="M4.93 4.93l1.41 1.41" />
+            <path d="M17.66 17.66l1.41 1.41" />
+            <path d="M2 12h2" />
+            <path d="M20 12h2" />
+            <path d="M6.34 17.66l-1.41 1.41" />
+            <path d="M19.07 4.93l-1.41 1.41" />
+          </svg>
+          <!-- Moon icon -->
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+          </svg>
+        </button>
+        <button class="nav-menu-btn" aria-label="Toggle menu">&#9776;</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="section-container hero-container">
+      <div class="hero-content">
+        <div class="badge-status">
+          <span class="pulse-indicator"></span> Local-First Architecture
+        </div>
+        <h1 class="hero-title">
+          Command your <span class="text-cyan">Opportunities</span>, manage <span class="text-emerald">Referrals</span>, and master your <span class="text-purple">Next Moves</span> from a single <span class="glow-gradient">Command Center</span>.
+        </h1>
+        <p class="hero-description">
+          PrepOps is a local-first, AI-powered job tracking and interview preparation system built for software engineers. Complete privacy, peak performance, and zero cloud dependencies.
+        </p>
+        <div class="hero-ctas">
+          <a href="#setup" class="btn btn-primary">Start Installation</a>
+          <a href="https://github.com/jeetsavsani1173/PrepOps" target="_blank" rel="noopener noreferrer" class="btn btn-secondary flex-center gap-2">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
+            </svg>
+            <span>GitHub Repository</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem Section -->
+  <section id="problem" class="problem-section">
+    <div class="section-container">
+      <div class="slabel">The Challenge</div>
+      <h2 class="stitle">Why Job Tracking is Broken</h2>
+      <p class="sdesc">Managing career changes using spreadsheets, fragmented notes, and third-party trackers is a bottleneck for engineers.</p>
+
+      <div class="feats">
+        <div class="feat">
+          <div class="fi" style="background:var(--accent-rose-bg); color:var(--accent-rose)">✕</div>
+          <div>
+            <h4>Spreadsheets Fail at Scale</h4>
+            <p>Updating row heights, copy-pasting descriptions, and manually recording timeline history is tedious and quickly falls out of sync.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="fi" style="background:var(--accent-rose-bg); color:var(--accent-rose)">✕</div>
+          <div>
+            <h4>Cloud Privacy Risks</h4>
+            <p>Third-party platforms ingest your full resume, cover letter, and compensation requirements, often parsing them for their own data brokers.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="fi" style="background:var(--accent-rose-bg); color:var(--accent-rose)">✕</div>
+          <div>
+            <h4>Unstructured Prep Paths</h4>
+            <p>Finding a job posting is only 10% of the process. Identifying core skill gaps and preparing for specific interview rounds requires structured task management.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <h4 style="font-size:0.95rem; font-weight:700; margin-bottom:8px; color:var(--accent-emerald)">Why Local-First Matters</h4>
+        <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.7;">
+          Your career data, search strategy, and interview notes contain high-value PII. PrepOps keeps all details **100% locally on your machine**. With zero external servers to trust, you gain peak database performance and ironclad security.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features -->
+  <section id="features" class="features-section">
+    <div class="section-container">
+      <div class="section-header">
+        <p class="section-subtitle">Core Capabilities</p>
+        <h2 class="section-title">Designed for Developer Pipelines</h2>
+        <p class="section-desc">No spreadsheets, no cloud databases, no trackers. Complete agency over your job search.</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-cyan-alpha text-cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M9 3v18M15 3v18" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Drag-and-Drop Kanban</h3>
+          <p class="feature-card-text">Move applications across Saved, Applied, Interview, and Closed. Visual status updates record history automatically.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-emerald-alpha text-emerald">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+              <line x1="12" y1="22.08" x2="12" y2="12" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Automated Scraping</h3>
+          <p class="feature-card-text">Powered by Playwright and Cheerio. Pull details from any job posting URL with a single click, respecting robots.txt.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-indigo-alpha text-indigo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Local Resume Parser</h3>
+          <p class="feature-card-text">Upload PDF resumes locally. The system runs local extraction schemas to map skills, keeping your personal file data private.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-amber-alpha text-amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 12 17 22 12" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Gemini AI Recommendation</h3>
+          <p class="feature-card-text">Analyzes match scores, identifies key skill gaps, and auto-suggests prep tasks specifically tailored for the target role.</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-rose-alpha text-rose">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Status Transition Timeline</h3>
+          <p class="feature-card-text">Maintains a visual activity history for every opportunity. Tracks days in current stage and elapsed time between transitions.</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-purple-alpha text-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 3v18h18" />
+              <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Pipeline Analytics</h3>
+          <p class="feature-card-text">Aggregates application volumes, conversion funnels, match score ranges, and top skills in a standalone CSS workspace.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pipeline Flow Section -->
+  <section id="pipeline" class="pipeline-section">
+    <div class="section-container">
+      <div class="slabel">Ingestion & Prep Pipeline</div>
+      <h2 class="stitle">End-to-End Operation Flow</h2>
+      <p class="sdesc">How PrepOps parses, evaluates, and tracks opportunities from ingestion to offer.</p>
+
+      <div class="flow">
+        <div class="fnode">
+          <h4>Job URL</h4>
+          <p>Manual input or Chrome extension trigger</p>
+        </div>
+        <div class="farrow">&#10132;</div>
+        <div class="fnode" style="border-color: var(--accent-cyan)">
+          <h4>Scraper Ingest</h4>
+          <p>Playwright scans dynamic elements</p>
+        </div>
+        <div class="farrow">&#10132;</div>
+        <div class="fnode">
+          <h4>Cheerio Parse</h4>
+          <p>Pulls semantic markdown details</p>
+        </div>
+        <div class="farrow">&#10132;</div>
+        <div class="fnode" style="border-color: var(--accent-purple)">
+          <h4>AI Analysis</h4>
+          <p>Gemini maps skill gaps & match score</p>
+        </div>
+        <div class="farrow">&#10132;</div>
+        <div class="fnode" style="border-color: var(--accent-amber)">
+          <h4>Prep Steps</h4>
+          <p>Auto-generates recommended study tasks</p>
+        </div>
+        <div class="farrow">&#10132;</div>
+        <div class="fnode" style="border-color: var(--accent-emerald)">
+          <h4>Kanban Track</h4>
+          <p>Drag-and-drop workflow updates status</p>
+        </div>
+      </div>
+
+      <!-- Pipeline Steps Detail -->
+      <div class="pipeline-steps-wrapper">
+        <h4 class="pipeline-title">Orchestrated Pipeline Steps</h4>
+        <div class="setup-steps">
+          <div class="setup-step">
+            <div class="setup-step-icon" style="background:var(--accent-cyan-bg); color:var(--accent-cyan)">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/></svg>
+            </div>
+            <div class="setup-step-body">
+              <h5>Step 1 &mdash; Job Ingestion Signal</h5>
+              <p>A user copies a job board URL into the PrepOps command panel, or clicks "Save to PrepOps" on the Chrome extension. The local server takes the URL and routes it to the scraping queue.</p>
+            </div>
+          </div>
+          <div class="setup-step">
+            <div class="setup-step-icon" style="background:var(--accent-indigo-bg); color:var(--accent-indigo)">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="setup-step-body">
+              <h5>Step 2 &mdash; Dynamic Playwright Scrape</h5>
+              <p>For JavaScript-heavy applications, Playwright starts a headless browser locally to await elements. Cheerio loads the DOM snapshot and extracts structural description sections.</p>
+            </div>
+          </div>
+          <div class="setup-step">
+            <div class="setup-step-icon" style="background:var(--accent-purple-bg); color:var(--accent-purple)">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path d="M13 7H7v6h6V7z"/><path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2V2a1 1 0 112 0v1h1a2 2 0 012 2v1h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v1a2 2 0 01-2 2h-1v1a1 1 0 11-2 0v-1h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H6a2 2 0 01-2-2v-1H3a1 1 0 110-2h1v-2H3a1 1 0 110-2h1V7H3a1 1 0 110-2h1V4a2 2 0 012-2h1V2zm9 4H6v8h10V6z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="setup-step-body">
+              <h5>Step 3 &mdash; AI Matching &amp; Gap Detection</h5>
+              <p>The parsed description markdown is passed to the Gemini API alongside the user's active resume. Gemini runs a structured evaluation to calculate matching scores and missing core skills.</p>
+            </div>
+          </div>
+          <div class="setup-step">
+            <div class="setup-step-icon" style="background:var(--accent-amber-bg); color:var(--accent-amber)">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="setup-step-body">
+              <h5>Step 4 &mdash; Prep Task Generation</h5>
+              <p>Based on the identified gaps, PrepOps auto-seeds specific, actionable tasks in the candidate's workspace workspace (e.g. "Review Next.js Parallel Routes", "Write custom debounce implementation").</p>
+            </div>
+          </div>
+          <div class="setup-step">
+            <div class="setup-step-icon" style="background:var(--accent-emerald-bg); color:var(--accent-emerald)">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="setup-step-body">
+              <h5>Step 5 &mdash; Kanban &amp; Transition Log</h5>
+              <p>As you progress through interview stages, status history records keep a precise log of each transition. If an application remains in a column for over 10 days, a warning dashboard alert lights up.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Strategies Section -->
+  <section id="strategies" class="strategies-section">
+    <div class="section-container">
+      <div class="slabel">Deployments</div>
+      <h2 class="stitle">Operational Strategies</h2>
+      <p class="sdesc">Three options for hosting and integrating PrepOps on your machine.</p>
+
+      <div class="strats">
+        <div class="scard rec">
+          <div class="ico">💻</div>
+          <h3>Local Development</h3>
+          <p>Run directly on your system shell. Ideal for styling, debugging, and direct Node.js interaction.</p>
+          <div class="stat">SQLite DB / localhost:3000</div>
+        </div>
+        <div class="scard">
+          <div class="ico">🐳</div>
+          <h3>Docker Stack</h3>
+          <p>A sandbox container compose setup. Isolates all dependencies and auto-mounts persistent local storage volumes.</p>
+          <div class="stat">Docker Compose / SQLite Volume</div>
+        </div>
+        <div class="scard">
+          <div class="ico">🔌</div>
+          <h3>Chrome Extension</h3>
+          <p>Integrate a Manifest V3 sidecar in your browser to scrape active tabs and post directly to local endpoints.</p>
+          <div class="stat">Chrome unpacked extension</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Setup Guide -->
+  <section id="setup" class="setup-section">
+    <div class="section-container">
+      <div class="section-header">
+        <p class="section-subtitle">Documentation</p>
+        <h2 class="section-title">Setup Command Center</h2>
+        <p class="section-desc">Deploy PrepOps on your machine in under five minutes. Choose your deployment style below.</p>
+      </div>
+
+      <div class="setup-tabs-wrapper">
+        <div class="setup-tabs" role="tablist">
+          <button class="tab-btn active" role="tab" aria-selected="true" data-target="tab-local">Local Dev Setup</button>
+          <button class="tab-btn" role="tab" aria-selected="false" data-target="tab-docker">Docker Stack</button>
+          <button class="tab-btn" role="tab" aria-selected="false" data-target="tab-extension">Chrome Extension</button>
+          <button class="tab-btn" role="tab" aria-selected="false" data-target="tab-env">API Configuration</button>
+        </div>
+
+        <div class="tab-content-container">
+          <!-- Tab 1: Local -->
+          <div id="tab-local" class="tab-pane active" role="tabpanel">
+            <div class="tab-pane-content">
+              <div class="instructions-side">
+                <h3>Run Dev Server Locally</h3>
+                <p>Perfect for developers who want to inspect changes and run code directly on Node.js.</p>
+                <ol class="setup-steps-list">
+                  <li>Install workspace package packages using <code>npm install</code>.</li>
+                  <li>Configure database variables inside <code>.env</code> file.</li>
+                  <li>Build tables and insert mock seed data with Prisma migrations.</li>
+                  <li>Start the Next.js hot-reload development server.</li>
+                </ol>
+              </div>
+              <div class="code-side">
+                <div class="terminal-window">
+                  <div class="terminal-bar">
+                    <span class="term-dot"></span>
+                    <span class="term-dot"></span>
+                    <span class="term-dot"></span>
+                    <span class="term-title">terminal — local dev</span>
+                  </div>
+                  <div class="terminal-body font-mono">
+                    <div class="code-block-wrapper">
+                      <button class="copy-btn" data-clipboard="npm install && cp .env.example .env">Copy</button>
+                      <span class="text-teal">$</span> npm install && cp .env.example .env
+                    </div>
+                    <div class="code-block-wrapper">
+                      <button class="copy-btn" data-clipboard="npx prisma migrate dev">Copy</button>
+                      <span class="text-teal">$</span> npx prisma migrate dev
+                    </div>
+                    <div class="code-block-wrapper">
+                      <button class="copy-btn" data-clipboard="npm run dev">Copy</button>
+                      <span class="text-teal">$</span> npm run dev
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Collapsible Terminal Log Accordion -->
+                <div class="accordion" style="margin-top: 1.5rem;">
+                  <button class="accordion-toggle">
+                    <span>▶ Run Logs Preview &mdash; npm run dev</span>
+                    <svg class="chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                  </button>
+                  <div class="accordion-body">
+                    <div class="terminal-window" style="border-top:none; border-top-left-radius:0; border-top-right-radius:0;">
+                      <div class="terminal-body font-mono text-zinc-400" style="padding: 1rem 1.25rem;">
+                        <span class="text-teal">▲ Next.js 15.1.0</span><br>
+                        - Local: <span class="text-indigo">http://localhost:3000</span><br>
+                        - Env: .env loaded<br><br>
+                        <span class="text-emerald">○ DB Connected:</span> Prisma + SQLite database ok<br>
+                        <span class="text-zinc">✓ Loaded 24 initial skill-mapping keywords</span><br>
+                        <span class="text-zinc">✓ Ingestion service listening on API endpoint</span><br><br>
+                        <span class="text-amber">cascade &gt;</span> compiled client and server successfully in 843ms
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Docker -->
+          <div id="tab-docker" class="tab-pane" role="tabpanel">
+            <div class="tab-pane-content">
+              <div class="instructions-side">
+                <h3>One-Command Container Deployment</h3>
+                <p>Deploy the application container stack instantly with persistent database and storage volumes.</p>
+                <ol class="setup-steps-list">
+                  <li>Build local Docker images using Docker Compose.</li>
+                  <li>Launch app container mapped to local port 3000.</li>
+                  <li>Persistent Docker volumes secure SQLite database state and resumes.</li>
+                </ol>
+              </div>
+              <div class="code-side">
+                <div class="terminal-window">
+                  <div class="terminal-bar">
+                    <span class="term-dot"></span>
+                    <span class="term-dot"></span>
+                    <span class="term-dot"></span>
+                    <span class="term-title">terminal — docker stack</span>
+                  </div>
+                  <div class="terminal-body font-mono">
+                    <div class="code-block-wrapper">
+                      <button class="copy-btn" data-clipboard="docker-compose up --build">Copy</button>
+                      <span class="text-teal">$</span> docker-compose up --build
+                    </div>
+                    <div class="text-zinc"># Detached mode</div>
+                    <div class="code-block-wrapper">
+                      <button class="copy-btn" data-clipboard="docker-compose up -d --build">Copy</button>
+                      <span class="text-teal">$</span> docker-compose up -d --build
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Collapsible Docker logs Accordion -->
+                <div class="accordion" style="margin-top: 1.5rem;">
+                  <button class="accordion-toggle">
+                    <span>▶ Build Logs Preview &mdash; docker-compose up</span>
+                    <svg class="chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                  </button>
+                  <div class="accordion-body">
+                    <div class="terminal-window" style="border-top:none; border-top-left-radius:0; border-top-right-radius:0;">
+                      <div class="terminal-body font-mono text-zinc-400" style="padding: 1rem 1.25rem;">
+                        <span class="text-teal">docker &gt;</span> [1/3] Building nextjs-app image... <span class="text-emerald">done</span><br>
+                        <span class="text-teal">docker &gt;</span> [2/3] Preparing volume /storage... <span class="text-emerald">mounted</span><br>
+                        <span class="text-teal">docker &gt;</span> [3/3] Launching database services... <span class="text-emerald">running</span><br><br>
+                        <span class="text-indigo">prepops-app-1  |</span> Prisma DB Client Initialized.<br>
+                        <span class="text-indigo">prepops-app-1  |</span> Next.js server listening on port 3000<br>
+                        <span class="text-indigo">prepops-app-1  |</span> Ingestion container active
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3: Extension -->
+          <div id="tab-extension" class="tab-pane" role="tabpanel">
+            <div class="tab-pane-content">
+              <div class="instructions-side">
+                <h3>Browser Ingestion Extension</h3>
+                <p>Capture postings instantly from any board (LinkedIn, Glassdoor, etc.) and push them directly to SQLite.</p>
+                <ol class="setup-steps-list">
+                  <li>Open Google Chrome and head to <code>chrome://extensions</code>.</li>
+                  <li>Enable <strong>Developer mode</strong> in the top-right toggle.</li>
+                  <li>Click <strong>Load unpacked</strong> in the top-left section.</li>
+                  <li>Select the <code>extension/</code> folder in the root directory.</li>
+                  <li>Load any job posting page and click <strong>Save To PrepOps</strong>.</li>
+                </ol>
+              </div>
+              <div class="code-side">
+                <div class="extension-mock">
+                  <div class="ext-header">
+                    <span class="ext-logo">P</span>
+                    <span class="ext-title">PrepOps Extension</span>
+                  </div>
+                  <div class="ext-body">
+                    <p class="ext-label">Target Url detected:</p>
+                    <div class="ext-url-bar font-mono">https://linkedin.com/jobs/view/...</div>
+                    <button class="ext-action-btn">Save To PrepOps</button>
+                    <p class="ext-status font-mono">✓ Ingestion successful (SAVED)</p>
+                  </div>
+                </div>
+
+                <!-- Collapsible Extension Logs Accordion -->
+                <div class="accordion" style="margin-top: 1.5rem;">
+                  <button class="accordion-toggle">
+                    <span>▶ Service Worker Event Logs</span>
+                    <svg class="chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                  </button>
+                  <div class="accordion-body">
+                    <div class="terminal-window" style="border-top:none; border-top-left-radius:0; border-top-right-radius:0;">
+                      <div class="terminal-body font-mono text-zinc-400" style="padding: 1rem 1.25rem;">
+                        <span class="text-purple">[extension]</span> Content script loaded on: https://linkedin.com/jobs/view/12345<br>
+                        <span class="text-purple">[extension]</span> Parsed schema elements: Title, Company, Description html<br>
+                        <span class="text-purple">[extension]</span> Packaging JSON payload... 14.2 KB<br><br>
+                        <span class="text-teal">POST http://localhost:3000/api/opportunities/ingest</span><br>
+                        Authorization: Bearer <span class="text-zinc">****************</span><br>
+                        Response: <span class="text-emerald">200 OK</span> { id: "a2b3c4...", status: "SAVED" }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 4: Env -->
+          <div id="tab-env" class="tab-pane" role="tabpanel">
+            <div class="tab-pane-content">
+              <div class="instructions-side">
+                <h3>Gemini API Key Setup</h3>
+                <p>Access high-fidelity matching, gaps analysis, and custom message drafts by configuring your Gemini API variables.</p>
+                <ol class="setup-steps-list">
+                  <li>Visit the **<a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">Google AI Studio</a>**.</li>
+                  <li>Click **"Get API key"** and create your key credentials.</li>
+                  <li>Paste the key inside the <code>.env</code> file.</li>
+                  <li>Set <code>AI_ENABLED="true"</code> and save.</li>
+                </ol>
+              </div>
+              <div class="code-side">
+                <div class="terminal-window">
+                  <div class="terminal-bar">
+                    <span class="term-dot"></span>
+                    <span class="term-dot"></span>
+                    <span class="term-dot"></span>
+                    <span class="term-title">workspace — .env config</span>
+                  </div>
+                  <div class="terminal-body font-mono">
+                    <div class="text-zinc"># AI Integration Settings</div>
+                    <div>AI_ENABLED="true"</div>
+                    <div>AI_PROVIDER="gemini"</div>
+                    <div class="text-cyan">GEMINI_API_KEY="AIzaSyYourKeyHere..."</div>
+                    <div>GEMINI_MODEL="gemini-2.0-flash"</div>
+                    <div class="text-zinc"># Referral tracking toggle</div>
+                    <div>REFERRAL_TRACKING_ENABLED="true"</div>
+                  </div>
+                </div>
+
+                <!-- Collapsible API logs Accordion -->
+                <div class="accordion" style="margin-top: 1.5rem;">
+                  <button class="accordion-toggle">
+                    <span>▶ Schema Extraction Logs &mdash; gemini-2.0-flash</span>
+                    <svg class="chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                  </button>
+                  <div class="accordion-body">
+                    <div class="terminal-window" style="border-top:none; border-top-left-radius:0; border-top-right-radius:0;">
+                      <div class="terminal-body font-mono text-zinc-400" style="padding: 1rem 1.25rem;">
+                        <span class="text-purple">[gemini-ai]</span> Calling Gemini 2.0 Flash API endpoint...<br>
+                        <span class="text-purple">[gemini-ai]</span> System Schema: IngestionMatchOutput<br>
+                        <span class="text-purple">[gemini-ai]</span> Raw Tokens: 3.4K In / 412 Out<br><br>
+                        <span class="text-indigo">Response Structured JSON:</span><br>
+                        {<br>
+                        &nbsp;&nbsp;"matchScore": 88,<br>
+                        &nbsp;&nbsp;"skillGaps": ["TypeScript App Router", "Tailwind CSS v4", "Docker"],<br>
+                        &nbsp;&nbsp;"recommendedTasks": ["Complete Next.js routing tutorial", "Create docker container stack"]<br>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Safeguards & Rules Section -->
+  <section id="rules" class="rules-section">
+    <div class="section-container">
+      <div class="slabel">System Safeguards</div>
+      <h2 class="stitle">Design Rules &amp; Constraints</h2>
+      <p class="sdesc">Architectural guidelines that ensure local performance, privacy, and consistency.</p>
+
+      <div class="feats">
+        <div class="feat">
+          <div class="fi">🔒</div>
+          <div>
+            <h4>Zero Cloud Dependencies</h4>
+            <p>Database state and uploaded files are stored entirely locally, never uploaded to third-party clouds.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="fi">👤</div>
+          <div>
+            <h4>Local Resume Records</h4>
+            <p>Resumes are stored on the local filesystem. Only the file path is saved in SQLite to prevent database bloat.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="fi">🔑</div>
+          <div>
+            <h4>Secure Secrets Store</h4>
+            <p>Gemini and OpenAI API tokens remain inside `.env` configurations, protected from codebase commits.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="fi">🤖</div>
+          <div>
+            <h4>Polite Scraping Checks</h4>
+            <p>The ingestion module reads and respects robots.txt permissions and restricts quick serial request loops.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="fi">📂</div>
+          <div>
+            <h4>Structured AI Parsing</h4>
+            <p>AI signals are strictly validated using JSON schemas before database writes to ensure relational safety.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="fi">⏱</div>
+          <div>
+            <h4>Transition Timelines</h4>
+            <p>Every column move triggers a `StatusHistory` record to measure performance and capture stale cards.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="fi">🆔</div>
+          <div>
+            <h4>UUID Identifiers</h4>
+            <p>Prisma models enforce RFC-compliant UUID keys across all tables to avoid sequential ID attacks.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="fi">🎨</div>
+          <div>
+            <h4>Terminal Styling Guides</h4>
+            <p>UI states use Zinc/Slate dark themes with specific Amber, Emerald, and Indigo colors for indicators.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section id="architecture" class="architecture-section">
+    <div class="section-container">
+      <div class="section-header">
+        <p class="section-subtitle">System Architecture</p>
+        <h2 class="section-title">Modern Local Infrastructure</h2>
+        <p class="section-desc">Fully decentralized. Running directly on your local system with high-speed performance.</p>
+      </div>
+
+      <div class="architecture-grid">
+        <!-- Tech 1 -->
+        <div class="tech-badge">
+          <div class="tech-icon text-indigo">N</div>
+          <div class="tech-info">
+            <span class="tech-name">Next.js 15+</span>
+            <span class="tech-role">React Framework (Turbopack)</span>
+          </div>
+        </div>
+        <!-- Tech 2 -->
+        <div class="tech-badge">
+          <div class="tech-icon text-cyan">T</div>
+          <div class="tech-info">
+            <span class="tech-name">Tailwind v4</span>
+            <span class="tech-role">CSS Styling & variables</span>
+          </div>
+        </div>
+        <!-- Tech 3 -->
+        <div class="tech-badge">
+          <div class="tech-icon text-emerald">P</div>
+          <div class="tech-info">
+            <span class="tech-name">Prisma ORM</span>
+            <span class="tech-role">DB Client Schema & migrations</span>
+          </div>
+        </div>
+        <!-- Tech 4 -->
+        <div class="tech-badge">
+          <div class="tech-icon text-amber">S</div>
+          <div class="tech-info">
+            <span class="tech-name">SQLite</span>
+            <span class="tech-role">Local Database Storage</span>
+          </div>
+        </div>
+        <!-- Tech 5 -->
+        <div class="tech-badge">
+          <div class="tech-icon text-rose">P</div>
+          <div class="tech-info">
+            <span class="tech-name">Playwright</span>
+            <span class="tech-role">Dynamic Ingestion & Scraping</span>
+          </div>
+        </div>
+        <!-- Tech 6 -->
+        <div class="tech-badge">
+          <div class="tech-icon text-purple">G</div>
+          <div class="tech-info">
+            <span class="tech-name">Gemini API</span>
+            <span class="tech-role">Structured matching evaluations</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impact & Metrics Section -->
+  <section id="impact" class="impact-section">
+    <div class="section-container">
+      <div class="slabel">Results</div>
+      <h2 class="stitle">Funnel Analytics &amp; Control</h2>
+      <p class="sdesc">Optimizing your interview pipeline metrics without disclosing data to third parties.</p>
+
+      <div class="impact-grid">
+        <div class="impact-card">
+          <div class="metric">100%</div>
+          <h4>Local Data Privacy</h4>
+          <p>Every resume keyword, status change, and personal note stays local on your system</p>
+        </div>
+        <div class="impact-card">
+          <div class="metric">&lt; 2s</div>
+          <h4>Fast Page Ingestion</h4>
+          <p>Scrape job details, run match analytics, and update kanban pipelines instantly</p>
+        </div>
+        <div class="impact-card">
+          <div class="metric">$0</div>
+          <h4>Zero Monthly Cloud Cost</h4>
+          <p>Free open-source tools run directly in docker or local node environment, saving subscription fees</p>
+        </div>
+        <div class="impact-card">
+          <div class="metric">10+ Days</div>
+          <h4>Stale Card Detection</h4>
+          <p>Auto-flag applications that are inactive for over 10 days to keep your funnel clean</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="section-container footer-container">
+      <div class="footer-brand">
+        <div class="logo-area">
+          <div class="logo-box">P</div>
+          <span class="logo-title text-zinc-100">PrepOps</span>
+        </div>
+        <p class="footer-motto">Your career data belongs to you. Zero cloud dependencies.</p>
+      </div>
+      <div class="footer-meta font-mono text-zinc-500">
+        <span>© 2026 PrepOps Project. Built for software engineers.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
